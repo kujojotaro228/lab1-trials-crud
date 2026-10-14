@@ -1,0 +1,45 @@
+{
+  "mode": "open",
+  "target": "item",
+  "rate": 100,
+  "concurrency": null,
+  "duration_s": 30.0,
+  "warmup_s": 10.0,
+  "timeout_s": 30.0,
+  "requests_in_window": 3000,
+  "sent_rps": 100.0,
+  "achieved_rps": 100.0,
+  "p50_ms": 2.362,
+  "p95_ms": 2.978,
+  "p99_ms": 3.399,
+  "max_ms": 4.089,
+  "mean_ms": 2.4,
+  "non2xx_pct": 0.0,
+  "send_lag_p99_ms": 0.761,
+  "statuses": {
+    "200": 3000
+  },
+  "instances": {
+    "93b05b6d388a": 1500,
+    "bd9ae4353ba7": 1500
+  },
+  "little": {
+    "lambda_rps": 100.0,
+    "W_s": 0.001973,
+    "lambda_x_W": 0.1973,
+    "L_sampled": 0.1086,
+    "L_exact": 0.1973,
+    "samples_per_proc": 14942,
+    "diff_pct": 81.61
+  },
+  "generator": {
+    "procs": 12,
+    "threads_per_proc_max": 267,
+    "python": "3.12.3",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "cpu_count": 12
+  },
+  "instances_label": 2,
+  "repeat": 3,
+  "started_at": "2026-10-14T16:40:19"
+}

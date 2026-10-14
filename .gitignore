@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.pyc
+.venv/
+venv/
+.idea/
+.vscode/
+req-win.txt
+*.docx
+*.zip
+results_sections_7_8.md

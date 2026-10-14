@@ -1,0 +1,197 @@
+[
+  {
+    "mode": "open",
+    "target": "noop",
+    "rate": 10,
+    "concurrency": null,
+    "duration_s": 10.0,
+    "warmup_s": 3.0,
+    "timeout_s": 10.0,
+    "requests_in_window": 100,
+    "sent_rps": 10.0,
+    "achieved_rps": 10.0,
+    "p50_ms": 1.512,
+    "p95_ms": 2.36,
+    "p99_ms": 2.647,
+    "max_ms": 3.092,
+    "mean_ms": 1.557,
+    "non2xx_pct": 0.0,
+    "send_lag_p99_ms": 0.952,
+    "statuses": {
+      "200": 100
+    },
+    "instances": {},
+    "little": {
+      "lambda_rps": 10.0,
+      "W_s": 0.001055,
+      "lambda_x_W": 0.0106,
+      "L_sampled": 0.0038,
+      "L_exact": 0.0106,
+      "samples_per_proc": 4502,
+      "diff_pct": 176.57
+    },
+    "generator": {
+      "procs": 10,
+      "threads_per_proc_max": 26,
+      "python": "3.12.3",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu_count": 12
+    }
+  },
+  {
+    "mode": "open",
+    "target": "noop",
+    "rate": 100,
+    "concurrency": null,
+    "duration_s": 10.0,
+    "warmup_s": 3.0,
+    "timeout_s": 10.0,
+    "requests_in_window": 1000,
+    "sent_rps": 100.0,
+    "achieved_rps": 100.0,
+    "p50_ms": 1.322,
+    "p95_ms": 1.7,
+    "p99_ms": 2.092,
+    "max_ms": 2.496,
+    "mean_ms": 1.337,
+    "non2xx_pct": 0.0,
+    "send_lag_p99_ms": 0.819,
+    "statuses": {
+      "200": 1000
+    },
+    "instances": {},
+    "little": {
+      "lambda_rps": 100.0,
+      "W_s": 0.000852,
+      "lambda_x_W": 0.0852,
+      "L_sampled": 0.0378,
+      "L_exact": 0.0852,
+      "samples_per_proc": 4946,
+      "diff_pct": 125.24
+    },
+    "generator": {
+      "procs": 12,
+      "threads_per_proc_max": 100,
+      "python": "3.12.3",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu_count": 12
+    }
+  },
+  {
+    "mode": "open",
+    "target": "noop",
+    "rate": 500,
+    "concurrency": null,
+    "duration_s": 10.0,
+    "warmup_s": 3.0,
+    "timeout_s": 10.0,
+    "requests_in_window": 5000,
+    "sent_rps": 500.0,
+    "achieved_rps": 499.9,
+    "p50_ms": 0.891,
+    "p95_ms": 1.194,
+    "p99_ms": 1.344,
+    "max_ms": 3.017,
+    "mean_ms": 0.896,
+    "non2xx_pct": 0.0,
+    "send_lag_p99_ms": 0.697,
+    "statuses": {
+      "200": 5000
+    },
+    "instances": {},
+    "little": {
+      "lambda_rps": 500.0,
+      "W_s": 0.000509,
+      "lambda_x_W": 0.2545,
+      "L_sampled": 0.0823,
+      "L_exact": 0.2544,
+      "samples_per_proc": 4989,
+      "diff_pct": 209.28
+    },
+    "generator": {
+      "procs": 12,
+      "threads_per_proc_max": 433,
+      "python": "3.12.3",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu_count": 12
+    }
+  },
+  {
+    "mode": "open",
+    "target": "noop",
+    "rate": 1000,
+    "concurrency": null,
+    "duration_s": 10.0,
+    "warmup_s": 3.0,
+    "timeout_s": 10.0,
+    "requests_in_window": 10000,
+    "sent_rps": 1000.0,
+    "achieved_rps": 999.9,
+    "p50_ms": 0.869,
+    "p95_ms": 1.243,
+    "p99_ms": 1.432,
+    "max_ms": 2.634,
+    "mean_ms": 0.875,
+    "non2xx_pct": 0.0,
+    "send_lag_p99_ms": 0.913,
+    "statuses": {
+      "200": 10000
+    },
+    "instances": {},
+    "little": {
+      "lambda_rps": 1000.0,
+      "W_s": 0.000431,
+      "lambda_x_W": 0.4314,
+      "L_sampled": 0.0758,
+      "L_exact": 0.4313,
+      "samples_per_proc": 4995,
+      "diff_pct": 468.82
+    },
+    "generator": {
+      "procs": 12,
+      "threads_per_proc_max": 500,
+      "python": "3.12.3",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu_count": 12
+    }
+  },
+  {
+    "mode": "open",
+    "target": "noop",
+    "rate": 2000,
+    "concurrency": null,
+    "duration_s": 10.0,
+    "warmup_s": 3.0,
+    "timeout_s": 10.0,
+    "requests_in_window": 20000,
+    "sent_rps": 1999.8,
+    "achieved_rps": 1999.4,
+    "p50_ms": 0.735,
+    "p95_ms": 1.019,
+    "p99_ms": 1.181,
+    "max_ms": 5.417,
+    "mean_ms": 0.743,
+    "non2xx_pct": 0.0,
+    "send_lag_p99_ms": 0.622,
+    "statuses": {
+      "200": 20000
+    },
+    "instances": {},
+    "little": {
+      "lambda_rps": 1999.8,
+      "W_s": 0.000406,
+      "lambda_x_W": 0.8119,
+      "L_sampled": 0.0828,
+      "L_exact": 0.811,
+      "samples_per_proc": 4998,
+      "diff_pct": 880.34
+    },
+    "generator": {
+      "procs": 12,
+      "threads_per_proc_max": 500,
+      "python": "3.12.3",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu_count": 12
+    }
+  }
+]

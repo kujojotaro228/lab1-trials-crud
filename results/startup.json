@@ -1,0 +1,17 @@
+{
+  "image": "trials-web",
+  "image_size_bytes": 156645903,
+  "image_size_mb": 156.6,
+  "image_size_mib": 149.4,
+  "healthz_times_s": [
+    7.261,
+    6.732,
+    6.75
+  ],
+  "healthz_median_s": 6.75,
+  "up_command_times_s": [
+    7.261,
+    6.732,
+    6.75
+  ]
+}
