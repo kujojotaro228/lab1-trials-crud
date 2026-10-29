@@ -39,6 +39,7 @@ RUN python -m compileall -q /app/app
 USER app
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", \
-     "--loop", "uvloop", "--http", "httptools", \
-     "--no-access-log", "--timeout-keep-alive", "75", "--backlog", "4096"]
+# Exec-форма: PID 1 — сам процес Python, тому SIGTERM від docker stop отримує
+# сервіс, а не оболонка. app.serve запускає uvicorn і завершується з кодом 0
+# після коректної зупинки (див. коментар у app/serve.py).
+CMD ["python", "-m", "app.serve"]

@@ -21,7 +21,7 @@ async def _create_pool() -> asyncpg.Pool:
         password=settings.db_password,
         database=settings.db_name,
         min_size=settings.pool_min,
-        max_size=settings.pool_max,
+        max_size=settings.pool_size,      # DB_POOL_SIZE: зʼєднань понад пул не буває
         timeout=3,            # тайм-аут встановлення одного підключення, с
         command_timeout=5,    # тайм-аут одного запиту до бази, с
         max_inactive_connection_lifetime=300,

@@ -45,7 +45,9 @@ services:
     environment:
       <<: *db-env
       DB_POOL_MIN: "2"
-      DB_POOL_MAX: "10"
+      DB_POOL_SIZE: "10"                      # варіант 25: найбільша кількість зʼєднань екземпляра
+      # POD_NAME не задано: з --scale у всіх реплік були б однакові значення,
+      # тому імʼям екземпляра (заголовок X-Pod) стає hostname контейнера
       LIST_DEFAULT_LIMIT: "20"
       LIST_MAX_LIMIT: "100"
     expose:
@@ -62,6 +64,9 @@ services:
       retries: 3
       start_period: 30s
       start_interval: 1s
+    # SIGTERM -> коректна зупинка (до 20 с, SHUTDOWN_TIMEOUT), SIGKILL лише після 30 с
+    stop_signal: SIGTERM
+    stop_grace_period: 30s
     deploy:
       resources:
         limits:
@@ -86,6 +91,21 @@ services:
     networks: [frontend]
     restart: unless-stopped
 
+  prometheus:
+    image: prom/prometheus:v2.53.2
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=15d
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - promdata:/prometheus                  # іменований том під часові ряди
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"       # сторінка Targets: http://localhost:9090/targets
+    networks: [frontend]                      # у тій самій мережі, що й web
+    restart: unless-stopped
+
   loadgen:
     image: python:3.12-alpine
     profiles: ["tools"]
@@ -104,3 +124,4 @@ networks:
 
 volumes:
   pgdata: {}
+  promdata: {}

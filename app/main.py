@@ -1,6 +1,7 @@
 
 import asyncio
 import logging
+import os
 import socket
 from contextlib import asynccontextmanager
 from typing import Any, Dict, List, Optional
@@ -10,7 +11,7 @@ from fastapi import FastAPI, Path, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 
-from . import db
+from . import db, metrics
 from .config import settings
 from .schemas import (
     ALLOWED_GROUPS,
@@ -24,7 +25,8 @@ logging.basicConfig(level=logging.INFO,
 log = logging.getLogger("app")
 
 RESOURCE = "/trial-participants"
-INSTANCE = socket.gethostname()          # id контейнера — для перевірки балансування
+# імʼя екземпляра: POD_NAME, а якщо змінну не задано — hostname контейнера
+INSTANCE = os.environ.get("POD_NAME") or socket.gethostname()
 MAX_ID = 2 ** 63 - 1                     # межа BIGINT
 MAX_OFFSET = 1_000_000_000
 
@@ -96,25 +98,31 @@ def values(p: ParticipantIn) -> tuple:
 # --------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    metrics.POD_INFO.labels(INSTANCE).set(1)
     ready = await db.wait_for_db(settings.db_startup_timeout)
-    log.info("instance=%s started, database ready=%s", INSTANCE, ready)
+    log.info("instance=%s started, database ready=%s, pool size=%d, cpu.stat=%s",
+             INSTANCE, ready, settings.pool_size, metrics.CPU_STAT_PATH)
     yield
+    # Сюди потрапляємо під час коректної зупинки: uvicorn уже перестав приймати
+    # зʼєднання і дочекався запитів в обробці. Лишається закрити пул.
     await db.close_pool()
+    log.info("instance=%s: connection pool closed", INSTANCE)
 
 
 app = FastAPI(title="Trial participants CRUD", version="1.0.0", lifespan=lifespan)
 
 
 class InstanceHeaderMiddleware:
-    """Чиста ASGI-обгортка: додає заголовок X-Instance з іменем контейнера.
+    """Чиста ASGI-обгортка: додає до кожної відповіді заголовок X-Pod з іменем
+    екземпляра (і X-Instance з тим самим значенням — його читають скрипти ЛР 1).
 
     Дає змогу генератору навантаження порахувати, скільки відповідей дав
-    кожен інстанс (підтвердження балансування). Стану не тримає.
+    кожен екземпляр (підтвердження балансування). Стану не тримає.
     """
 
     def __init__(self, app):
         self.app = app
-        self.header = (b"x-instance", INSTANCE.encode())
+        self.headers = [(b"x-pod", INSTANCE.encode()), (b"x-instance", INSTANCE.encode())]
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -123,13 +131,14 @@ class InstanceHeaderMiddleware:
 
         async def send_wrapper(message):
             if message["type"] == "http.response.start":
-                message["headers"] = list(message.get("headers", [])) + [self.header]
+                message["headers"] = list(message.get("headers", [])) + self.headers
             await send(message)
 
         await self.app(scope, receive, send_wrapper)
 
 
 app.add_middleware(InstanceHeaderMiddleware)
+app.add_middleware(metrics.MetricsMiddleware)   # додано останнім — зовнішній шар
 
 
 # --------------------------------------------------------------------------
@@ -271,6 +280,18 @@ async def delete_participant(participant_id: int = Path(ge=1, le=MAX_ID)):
     if deleted is None:
         return not_found(participant_id)
     return Response(status_code=204)
+
+
+@app.get("/livez")
+async def livez():
+    """Живучість процесу: 200 без звернення до бази."""
+    return JSONResponse({"status": "alive", "instance": INSTANCE})
+
+
+@app.get("/metrics", include_in_schema=False)
+async def prometheus_metrics():
+    body, content_type = metrics.render()
+    return Response(content=body, media_type=content_type)
 
 
 @app.get("/healthz")

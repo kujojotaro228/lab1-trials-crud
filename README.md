@@ -17,6 +17,29 @@ docker compose up -d --build
 
 ---
 
+## ЛР 2: метрики і межа масштабованості
+
+Звіт — [REPORT2.md](REPORT2.md). Стенд доповнено Prometheus (`http://localhost:9090/targets`).
+
+```powershell
+docker compose up -d --build
+py loadtest/seed.py
+py loadtest/lab2.py all          # межа генератора G, серія 1..4 екземпляри, коректна зупинка
+py loadtest/lab2_analyze.py      # results/lab2/analysis.md і діаграми results/lab2/charts/
+```
+
+| Що | Де |
+|---|---|
+| Метрики Prometheus, М3 (`cpu.stat`) | `app/metrics.py`, `GET /metrics` |
+| Живучість без бази | `GET /livez` |
+| Коректна зупинка за SIGTERM (код 0) | `app/serve.py`, `CMD ["python", "-m", "app.serve"]` |
+| Конфігурація збору | `prometheus/prometheus.yml` (`dns_sd_configs`, 5 с) |
+| Ступінчастий генератор | `loadtest/stepgen.py` |
+| Оркестратор і аналіз | `loadtest/lab2.py`, `loadtest/lab2_analyze.py` |
+| Стенд без Docker (емуляція) | `scripts/emu_stand.py`, `emu_run.py`, `emu_dns.py` |
+
+---
+
 ## Етап 1. Проєктування
 
 ### Таблиця `trial_participants`

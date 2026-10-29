@@ -1,0 +1,11 @@
+{
+ "backend": "docker",
+ "ncpu": 12,
+ "mem_bytes": 8173432832,
+ "os": "Docker Desktop",
+ "kernel": "6.18.54.1-microsoft-standard-WSL2",
+ "server": "29.8.2",
+ "web_limits": [
+  "/trials-web-1 NanoCpus=500000000 Memory=536870912"
+ ]
+}

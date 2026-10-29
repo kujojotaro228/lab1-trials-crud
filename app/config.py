@@ -21,8 +21,11 @@ class Settings:
         self.db_user: str = _env("DB_USER", "trials")
         self.db_password: str = _env("DB_PASSWORD")  # без значення за замовчуванням
 
-        self.pool_min: int = _env("DB_POOL_MIN", "2", int)
-        self.pool_max: int = _env("DB_POOL_MAX", "10", int)
+        # DB_POOL_SIZE — найбільша кількість відкритих зʼєднань екземпляра
+        # (варіант 25: 10). Зʼєднань понад пул немає: max_size пулу asyncpg і є межею.
+        # DB_POOL_MAX лишено як синонім для сумісності з ЛР 1.
+        self.pool_size: int = _env("DB_POOL_SIZE", os.environ.get("DB_POOL_MAX") or "10", int)
+        self.pool_min: int = min(_env("DB_POOL_MIN", "2", int), self.pool_size)
         # скільки секунд сервіс при старті чекає на базу, перш ніж почати
         # приймати запити (далі /healthz просто віддає 503, поки бази немає)
         self.db_startup_timeout: float = _env("DB_STARTUP_TIMEOUT", "30", float)

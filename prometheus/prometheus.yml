@@ -1,0 +1,21 @@
+# Prometheus для стенда ЛР 2.
+# Екземпляри web шукаються через вбудований DNS Docker: імʼя сервісу Compose
+# "web" резолвиться в адреси всіх його контейнерів (A-записи), список
+# оновлюється кожні 5 с, тож --scale web=N підхоплюється без перезапуску.
+global:
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: web
+    metrics_path: /metrics
+    dns_sd_configs:
+      - names: [web]
+        type: A
+        port: 8000
+        refresh_interval: 5s
+
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
