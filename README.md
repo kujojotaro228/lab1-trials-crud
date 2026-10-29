@@ -13,7 +13,7 @@ docker compose up -d --build
 Стенд доступний на `http://localhost:8080` (порт задається `LB_PORT` у `.env`).
 Два вебінстанси: `docker compose up -d --scale web=2`.
 
-Покрокова інструкція виконання роботи — [ІНСТРУКЦІЯ.md](ІНСТРУКЦІЯ.md), звіт — [REPORT.md](REPORT.md).
+Звіт — [REPORT.md](REPORT.md).
 
 ---
 
