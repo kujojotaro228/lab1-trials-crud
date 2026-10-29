@@ -1,0 +1,17 @@
+# prometheus-postgres-exporter: метрики бази (зʼєднання за станом, транзакції).
+config:
+  datasource:
+    host: db-0.db.trials.svc.cluster.local
+    port: "5432"
+    user: trials
+    database: trials
+    sslmode: disable
+    passwordSecret:
+      name: db-secret
+      key: POSTGRES_PASSWORD
+serviceMonitor:
+  enabled: true
+  interval: 5s
+nodeSelector: {role: infra}
+tolerations:
+  - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}

@@ -52,22 +52,48 @@ pc = time.perf_counter
 # Профіль
 # --------------------------------------------------------------------------
 class Profile:
+    """Ступінчастий профіль (прогрів + сходинки) або профіль з відрізків.
+
+    segments — список [тривалість, інтенсивність]; якщо задано, прогріву немає,
+    а «сходинка» k — це k-й відрізок (ЛР 3, крок 10).
+    """
+
     def __init__(self, warmup: float, warmup_rate: float, start: float, step: float,
-                 step_dur: float, max_steps: int):
+                 step_dur: float, max_steps: int, segments=None):
+        self.segments = [(float(d), float(r)) for d, r in segments] if segments else None
+        if self.segments:
+            warmup, max_steps = 0.0, len(self.segments)
+            self._bounds, t = [], 0.0
+            for d, _ in self.segments:
+                self._bounds.append((t, t + d))
+                t += d
         self.warmup, self.warmup_rate = warmup, warmup_rate
         self.start, self.step, self.step_dur = start, step, step_dur
         self.max_steps = max_steps
 
     def step_of(self, t: float) -> int:
-        """-1 — прогрів, k ≥ 0 — номер сходинки."""
+        """-1 — прогрів, k ≥ 0 — номер сходинки (відрізка)."""
+        if self.segments:
+            for k, (a, b) in enumerate(self._bounds):
+                if t < b:
+                    return k
+            return len(self._bounds)
         if t < self.warmup:
             return -1
         return int((t - self.warmup) // self.step_dur)
 
     def rate_of_step(self, k: int) -> float:
+        if self.segments:
+            if k < 0:
+                return 0.0
+            return self.segments[min(k, len(self.segments) - 1)][1]
         return self.warmup_rate if k < 0 else self.start + self.step * k
 
     def step_bounds(self, k: int) -> tuple[float, float]:
+        if self.segments:
+            if k < 0:
+                return 0.0, 0.0
+            return self._bounds[min(k, len(self._bounds) - 1)]
         if k < 0:
             return 0.0, self.warmup
         a = self.warmup + k * self.step_dur
@@ -75,6 +101,8 @@ class Profile:
 
     @property
     def total(self) -> float:
+        if self.segments:
+            return self._bounds[-1][1]
         return self.warmup + self.max_steps * self.step_dur
 
 
@@ -82,7 +110,7 @@ class Profile:
 # Мінімальний HTTP/1.1-клієнт (GET, keep-alive)
 # --------------------------------------------------------------------------
 class HttpConn(asyncio.Protocol):
-    __slots__ = ("transport", "buf", "fut", "closed", "pool")
+    __slots__ = ("transport", "buf", "fut", "closed", "pool", "nreq")
 
     def __init__(self, pool: "ConnPool"):
         self.pool = pool
@@ -90,6 +118,7 @@ class HttpConn(asyncio.Protocol):
         self.buf = bytearray()
         self.fut: asyncio.Future | None = None
         self.closed = False
+        self.nreq = 0
 
     def connection_made(self, transport):
         self.transport = transport
@@ -159,7 +188,16 @@ class ConnPool:
         if self.open >= self.max_conns:
             fut = asyncio.get_running_loop().create_future()
             self.waiters.append(fut)
-            return await fut
+            try:
+                return await fut
+            except asyncio.CancelledError:
+                # Тайм-аут запиту (wait_for) міг настати вже після того, як release()
+                # передав цьому очікувачу зʼєднання. Тоді зʼєднання треба повернути в
+                # пул, інакше місце в пулі втрачається назавжди: під тривалим
+                # перевантаженням усі місця «витікають», і генератор зупиняється.
+                if fut.done() and not fut.cancelled() and fut.exception() is None:
+                    self.release(fut.result(), True)
+                raise
         self.open += 1
         loop = asyncio.get_running_loop()
         try:
@@ -227,6 +265,7 @@ class Stats:
         self.lag = defaultdict(list)          # запізнення відправки відносно розкладу, с
         self.ok_dirty: dict[int, int] = defaultdict(int)
         self.pods = defaultdict(int)
+        self.pod_sec = defaultdict(lambda: defaultdict(int))   # секунда -> под -> 2xx
         self.max_inflight = 0
 
 
@@ -242,6 +281,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
             f"User-Agent: stepgen\r\nAccept: */*\r\n\r\n".encode() for p in paths]
     st = Stats()
     timeout = cfg["timeout"]
+    rpc = int(cfg.get("reqs_per_conn") or 0)
     inflight = 0
 
     # перехід від perf_counter до «секунд від t0»: t0 задано настінним годинником
@@ -256,14 +296,30 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
         reusable = False
         try:
             try:
-                conn = await asyncio.wait_for(pool.acquire(), timeout)
+                wait = timeout - (pc() - pc0 - sched_rel)
+                conn = await asyncio.wait_for(pool.acquire(), max(0.001, wait))
+                remaining = timeout - (pc() - pc0 - sched_rel)
+                if remaining <= 0:              # зʼєднання дісталось уже після тайм-ауту
+                    reusable = True
+                    raise asyncio.TimeoutError
                 fut = loop.create_future()
                 conn.fut = fut
                 conn.transport.write(req)
                 st.lag[int(sched_rel)].append(pc() - pc0 - sched_rel)
-                remaining = timeout - (pc() - pc0 - sched_rel)
-                status, keep, pod = await asyncio.wait_for(fut, max(0.001, remaining))
-                reusable = keep
+                try:
+                    status, keep, pod = await asyncio.wait_for(asyncio.shield(fut), remaining)
+                except asyncio.TimeoutError:
+                    # Відповідь не прийшла за тайм-аут: запит зараховано як не 2xx, але
+                    # зʼєднання не закривається — його дочитує окрема задача і повертає в
+                    # пул. Так генератор справді тримає сталу кількість зʼєднань, а сервер
+                    # не виконує марно роботу для вже закритих зʼєднань.
+                    asyncio.ensure_future(drain(conn, fut))
+                    conn = None
+                    raise
+                conn.nreq += 1
+                # модель зʼєднань ЛР 3: після reqs_per_conn запитів зʼєднання
+                # закривається, замість нього відкривається нове
+                reusable = keep and (rpc <= 0 or conn.nreq < rpc)
                 now = pc() - pc0
                 sec = int(now)
                 st.lat[sec].append(now - sched_rel)
@@ -272,6 +328,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                     st.ok_dirty[sec] += 1
                     if pod:
                         st.pods[pod] += 1
+                        st.pod_sec[sec][pod] += 1
                 else:
                     st.non2xx[sec] += 1
             except asyncio.TimeoutError:
@@ -288,6 +345,18 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
             if conn is not None:
                 conn.fut = None
                 pool.release(conn, reusable)
+
+    async def drain(conn: HttpConn, fut: asyncio.Future) -> None:
+        reusable = False
+        try:
+            _, keep, _ = await asyncio.wait_for(fut, 120)
+            conn.nreq += 1
+            reusable = keep and (rpc <= 0 or conn.nreq < rpc)
+        except BaseException:  # noqa: BLE001
+            reusable = False
+        finally:
+            conn.fut = None
+            pool.release(conn, reusable)
 
     async def flusher() -> None:
         while True:
@@ -336,6 +405,9 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                 rate = prof.rate_of_step(k)
                 if a >= ctl["stop_at"].value:
                     break
+                if rate <= 0 or b <= a:          # немає прогріву (профіль з відрізків)
+                    k += 1
+                    continue
                 interval = nprocs / rate
                 t = a + idx / rate
                 while t < min(b, ctl["stop_at"].value):
@@ -371,6 +443,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
         "connerr": dict(st.connerr), "timeouts": dict(st.timeouts),
         "lat": {s: v for s, v in st.lat.items()}, "pods": dict(st.pods),
         "lag": {s: v for s, v in st.lag.items()},
+        "pod_sec": {s: dict(v) for s, v in st.pod_sec.items()},
         "max_inflight": st.max_inflight, "max_conns_open": pool.open,
     }))
 
@@ -396,9 +469,11 @@ def percentile(sorted_vals, p):
 
 
 def step_summary(prof: Profile, k: int, per_sec: dict, lat_by_sec: dict,
-                 lag_by_sec: dict | None = None) -> dict:
+                 lag_by_sec: dict | None = None, settle: float = 5.0,
+                 pod_sec: dict | None = None) -> dict:
     a, b = prof.step_bounds(k)
-    secs = [s for s in range(int(a) + 5, int(b))]          # останні 15 с сходинки
+    # перші settle секунд сходинки — перехідні (ЛР 2: 5 с з 20, ЛР 3: 10 с з 30)
+    secs = [s for s in range(int(a) + int(settle), int(b))]
     ach = [per_sec["ok"].get(s, 0) for s in secs]
     lat = sorted(x for s in secs for x in lat_by_sec.get(s, []))
     lag = sorted(x for s in secs for x in (lag_by_sec or {}).get(s, []))
@@ -421,6 +496,11 @@ def step_summary(prof: Profile, k: int, per_sec: dict, lat_by_sec: dict,
         "p99_ms": round(percentile(lat, 99) * 1000, 2) if lat else None,
         "send_lag_p99_ms": round(percentile(lag, 99) * 1000, 2) if lag else None,
         "ratio": round(mean / rate, 4) if rate else None,
+        # 2xx-відповіді кожного пода за вікно (заголовок X-Pod), запитів/с
+        "pods_rps": {pod: round(sum((pod_sec or {}).get(s, {}).get(pod, 0) for s in secs)
+                                / len(secs), 2)
+                     for pod in sorted({p for s in secs for p in (pod_sec or {}).get(s, {})})}
+        if secs else {},
     }
 
 
@@ -444,6 +524,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
     below = 0
     stop_reason = "max_steps"
     G = cfg.get("gen_limit")
+    settle = cfg.get("settle", 5.0)
     while len(finals) < nprocs:
         try:
             kind, idx, data = out_q.get(timeout=0.2)
@@ -459,11 +540,12 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
         now_rel = time.time() - t0_wall
         k_now = prof.step_of(now_rel - 0.8)             # 0.8 с на доставку лічильників
         for k in range(0, k_now):
-            if k in evaluated or stop_at.value < prof.total:
+            if prof.segments or k in evaluated or stop_at.value < prof.total:
                 continue
             evaluated.add(k)
             a, b = prof.step_bounds(k)
-            ach = statistics.fmean(live_ok.get(s, 0) for s in range(int(a) + 5, int(b)))
+            ach = statistics.fmean(live_ok.get(s, 0)
+                                   for s in range(int(a) + int(settle), int(b)))
             rate = prof.rate_of_step(k)
             log(f"  step {k:2d}: target {rate:7.0f} rps  achieved {ach:8.1f} rps "
                 f"({100 * ach / rate:5.1f} %)")
@@ -483,7 +565,11 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
     lat_by_sec: dict[int, list] = defaultdict(list)
     lag_by_sec: dict[int, list] = defaultdict(list)
     pods: dict[str, int] = defaultdict(int)
+    pod_sec: dict[int, dict] = defaultdict(lambda: defaultdict(int))
     for f in finals.values():
+        for s, d in f.get("pod_sec", {}).items():
+            for pod, v in d.items():
+                pod_sec[int(s)][pod] += v
         for key in per_sec:
             for s, v in f[key].items():
                 per_sec[key][int(s)] += v
@@ -512,6 +598,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
             "p99_ms": round(percentile(lat, 99) * 1000, 3) if lat else None,
             "send_lag_p99_ms": round(percentile(sorted(lag_by_sec.get(s, [])), 99) * 1000, 3)
             if lag_by_sec.get(s) else None,
+            "pods": dict(pod_sec.get(s, {})),
         })
     # використання CPU генератором (сума по процесах), ядер, посекундно
     gen_cpu = defaultdict(float)
@@ -522,7 +609,8 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
     for row in seconds:
         row["gen_cpu_cores"] = round(gen_cpu.get(row["t_s"], 0.0), 3)
     n_steps = prof.step_of(last_sec - 1) + 1 if last_sec > prof.warmup else 0
-    steps = [step_summary(prof, k, per_sec, lat_by_sec, lag_by_sec) for k in range(n_steps)]
+    steps = [step_summary(prof, k, per_sec, lat_by_sec, lag_by_sec, settle, pod_sec)
+             for k in range(n_steps)]
     best = max(steps, key=lambda x: x["achieved_rps"]) if steps else None
     return {
         "name": cfg["name"], "target": cfg["target"], "base_url": cfg["base_url"],
@@ -539,7 +627,9 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
             "platform": platform.platform(), "cpu_count": os.cpu_count(),
             "max_inflight_per_proc": [f["max_inflight"] for f in finals.values()],
             "max_conns": cfg["max_conns"],
+            "reqs_per_conn": cfg.get("reqs_per_conn") or None,
         },
+        "settle_s": settle,
         "extra": cfg.get("extra", {}),
     }
 
@@ -552,7 +642,8 @@ def save(result: dict, out_dir: Path = LAB2_RAW) -> Path:
     with open(out_dir / f"{name}_seconds.csv", "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=list(result["seconds"][0].keys()))
         w.writeheader()
-        w.writerows(result["seconds"])
+        w.writerows({**r, "pods": json.dumps(r["pods"], ensure_ascii=False)}
+                    if isinstance(r.get("pods"), dict) else r for r in result["seconds"])
     return out_dir / f"{name}.json"
 
 
@@ -566,8 +657,24 @@ def make_cfg(args) -> dict:
         "max_conns": args.max_conns, "gen_limit": args.gen_limit,
         "profile": {"warmup": args.warmup, "warmup_rate": args.warmup_rate,
                     "start": args.start, "step": args.step, "step_dur": args.step_dur,
-                    "max_steps": args.max_steps},
+                    "max_steps": args.max_steps,
+                    "segments": parse_segments(getattr(args, "profile", None))},
+        "settle": getattr(args, "settle", 5.0),
+        "reqs_per_conn": getattr(args, "reqs_per_conn", 0),
     }
+
+
+def parse_segments(text):
+    """'30:300,60:2500,90:300' -> [[30, 300], [60, 2500], [90, 300]]."""
+    if not text:
+        return None
+    if isinstance(text, (list, tuple)):
+        return [list(x) for x in text]
+    out = []
+    for part in str(text).split(","):
+        d, r = part.split(":")
+        out.append([float(d), float(r)])
+    return out
 
 
 def build_argparser() -> argparse.ArgumentParser:
@@ -590,6 +697,12 @@ def build_argparser() -> argparse.ArgumentParser:
                         "запити чекають вільного зʼєднання, затримка все одно рахується від "
                         "запланованого моменту")
     p.add_argument("--seed", type=int, default=1)
+    p.add_argument("--settle", type=float, default=5.0,
+                   help="перехідні секунди на початку сходинки (ЛР 3: 10)")
+    p.add_argument("--reqs-per-conn", type=int, default=0,
+                   help="закривати зʼєднання після стількох запитів (ЛР 3: 100; 0 — ніколи)")
+    p.add_argument("--profile", default=None,
+                   help="профіль з відрізків 'тривалість:інтенсивність,...' замість сходинок")
     return p
 
 

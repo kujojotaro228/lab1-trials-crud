@@ -40,6 +40,23 @@ py loadtest/lab2_analyze.py      # results/lab2/analysis.md і діаграми 
 
 ---
 
+## ЛР 3: Kubernetes (k3d) з автомасштабуванням і без нього
+
+Звіт — [REPORT3.md](REPORT3.md). Потрібні Docker Desktop, k3d, kubectl, helm.
+
+```powershell
+docker compose down                                              # звільнити 8080/9090
+powershell -ExecutionPolicy Bypass -File scripts\k8s\deploy.ps1   # кластер, образ, база, web, моніторинг
+py loadtest/seed.py
+py loadtest/lab3.py all                                          # перевірки і всі прогони
+py loadtest/lab3_analyze.py                                      # results/lab3/analysis.md, charts/
+powershell -ExecutionPolicy Bypass -File scripts\k8s\destroy.ps1  # видалити кластер
+```
+
+Web — `http://localhost:8080`, Prometheus — `http://localhost:9090`, Ingress (Traefik) — `http://localhost:8081`.
+
+---
+
 ## Етап 1. Проєктування
 
 ### Таблиця `trial_participants`

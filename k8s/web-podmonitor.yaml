@@ -1,0 +1,13 @@
+# Пошук подів web для Prometheus (CRD з kube-prometheus-stack).
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: web
+  namespace: trials
+spec:
+  selector:
+    matchLabels: {app: web}
+  podMetricsEndpoints:
+    - port: http
+      path: /metrics
+      interval: 5s

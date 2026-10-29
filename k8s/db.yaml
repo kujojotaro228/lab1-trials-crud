@@ -1,0 +1,61 @@
+# PostgreSQL на вузлі role=infra: headless Service + StatefulSet з PVC.
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: trials
+  labels: {app: db}
+spec:
+  clusterIP: None                  # headless: стале імʼя db-0.db
+  selector: {app: db}
+  ports:
+    - {name: pg, port: 5432, targetPort: pg}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: db
+  namespace: trials
+spec:
+  serviceName: db
+  replicas: 1
+  selector:
+    matchLabels: {app: db}
+  template:
+    metadata:
+      labels: {app: db}
+    spec:
+      nodeSelector: {role: infra}
+      tolerations:
+        - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          args: ["-c", "max_connections=100"]
+          env:
+            - {name: POSTGRES_DB, value: trials}
+            - {name: POSTGRES_USER, value: trials}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: db-secret, key: POSTGRES_PASSWORD}
+            - {name: PGDATA, value: /var/lib/postgresql/data/pgdata}
+          ports:
+            - {name: pg, containerPort: 5432}
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -h 127.0.0.1 -U trials -d trials"]
+            periodSeconds: 5
+            timeoutSeconds: 3
+          resources:
+            requests: {cpu: 250m, memory: 256Mi}
+          volumeMounts:
+            - {name: data, mountPath: /var/lib/postgresql/data}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        storageClassName: local-path
+        resources:
+          requests: {storage: 1Gi}

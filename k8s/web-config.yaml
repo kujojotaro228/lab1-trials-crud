@@ -1,0 +1,18 @@
+# Налаштування web і міграції. Пароля тут немає: він у Secret db-secret,
+# який deploy.ps1 створює з файла .env.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: web-config
+  namespace: trials
+data:
+  DB_HOST: db-0.db                 # стале DNS-імʼя пода StatefulSet (headless Service db)
+  DB_PORT: "5432"
+  DB_NAME: trials
+  DB_USER: trials
+  DB_POOL_SIZE: "10"               # варіант 25 (ЛР 2)
+  DB_POOL_MIN: "2"
+  LIST_DEFAULT_LIMIT: "20"
+  LIST_MAX_LIMIT: "100"
+  # очікування запитів після SIGTERM: 15 с grace − 5 с preStop = 10 с, беремо з запасом
+  SHUTDOWN_TIMEOUT: "8"

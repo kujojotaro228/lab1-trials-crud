@@ -1,0 +1,24 @@
+# Разова міграція схеми (той самий образ, інша команда).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate
+  namespace: trials
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels: {app: migrate}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          image: trials-web:lab3
+          imagePullPolicy: Never
+          command: ["python", "-m", "app.migrate"]
+          envFrom:
+            - configMapRef: {name: web-config}
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: db-secret, key: POSTGRES_PASSWORD}
