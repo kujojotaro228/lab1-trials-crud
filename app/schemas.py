@@ -1,4 +1,5 @@
 
+import unicodedata
 from datetime import date
 from typing import Any, Dict, List, Optional
 
@@ -21,6 +22,17 @@ class ParticipantIn(BaseModel):
     status: str
     # null, поки учасник не завершив участь; якщо поле не передано — null
     completion_date: Optional[date] = None
+
+    @field_validator("participant_code", "protocol", "randomization_group", "status")
+    @classmethod
+    def _check_control_chars(cls, v: str) -> str:
+        # PostgreSQL не приймає \x00 у текстових полях (помилка кодування -> 500),
+        # а інші керівні символи (\t, \n, \x1b ...) у кодах і шифрах — сміттєві дані.
+        bad = next((ch for ch in v if unicodedata.category(ch) == "Cc"), None)
+        if bad is not None:
+            raise ValueError(
+                f"рядок містить недопустимий керівний символ U+{ord(bad):04X}")
+        return v
 
     @field_validator("randomization_group")
     @classmethod

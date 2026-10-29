@@ -174,6 +174,19 @@ async def on_check_violation(_request: Request, exc: asyncpg.CheckViolationError
                               "message": "порушено обмеження бази даних"}])
 
 
+async def on_bad_encoding(_request: Request, _exc: Exception):
+    # Другий рубіж для рядків, які база не може зберегти (наприклад, \x00).
+    # Схема відсіює їх раніше, але навіть тоді клієнт отримує 400, а не 500.
+    return validation_error([{"field": "body", "location": "body",
+                              "message": "рядок містить символ, який не можна зберегти"}])
+
+
+for _name in ("CharacterNotInRepertoireError", "UntranslatableCharacterError"):
+    _cls = _asyncpg_exc(_name)
+    if _cls is not None:
+        app.add_exception_handler(_cls, on_bad_encoding)
+
+
 # --------------------------------------------------------------------------
 # Ендпоінти
 # --------------------------------------------------------------------------
