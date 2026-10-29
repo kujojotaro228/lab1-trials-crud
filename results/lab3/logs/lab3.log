@@ -1,0 +1,176 @@
+
+#### 2026-10-29 20:24:44 loadtest/lab3.py host
+{
+ "docker": {
+  "ncpu": 12,
+  "mem_bytes": 8173432832,
+  "server": "29.8.2",
+  "kernel": "6.18.54.1-microsoft-standard-WSL2"
+ },
+ "nodes": [
+  {
+   "name": "k3d-trials-agent-0",
+   "labels": {},
+   "taints": [],
+   "kubelet": "v1.31.4+k3s1",
+   "cpu": "12",
+   "memory": "7981868Ki"
+  },
+  {
+   "name": "k3d-trials-agent-1",
+   "labels": {},
+   "taints": [],
+   "kubelet": "v1.31.4+k3s1",
+   "cpu": "12",
+   "memory": "7981868Ki"
+  },
+  {
+   "name": "k3d-trials-server-0",
+   "labels": {
+    "node-role.kubernetes.io/control-plane": "true",
+    "role": "infra"
+   },
+   "taints": [
+    {
+     "effect": "NoSchedule",
+     "key": "node-role.kubernetes.io/control-plane",
+     "value": "true"
+    }
+   ],
+   "kubelet": "v1.31.4+k3s1",
+   "cpu": "12",
+   "memory": "7981868Ki"
+  }
+ ]
+}
+
+#### 2026-10-29 20:24:52 loadtest/lab3.py crud
+== крок 4: повний цикл через localhost:8080, под за X-Pod
+   POST   /trial-participants                      -> 201 (expect 201) X-Pod=web-7d4db69db6-z2twp
+   GET    /trial-participants/101                  -> 200 (expect 200) X-Pod=web-7d4db69db6-z2twp
+   PUT    /trial-participants/101                  -> 200 (expect 200) X-Pod=web-7d4db69db6-z2twp
+   GET    /trial-participants/101                  -> 200 (expect 200) X-Pod=web-7d4db69db6-z2twp
+   DELETE /trial-participants/101                  -> 204 (expect 204) X-Pod=web-7d4db69db6-z2twp
+   GET    /trial-participants/101                  -> 404 (expect 404) X-Pod=web-7d4db69db6-z2twp
+   -> results\lab3\crud_check.md
+
+#### 2026-10-29 20:24:59 loadtest/lab3.py persist
+== крок 3: збереження даних після kubectl delete pod db-0
+   -> results\lab3\persistence.md
+
+#### 2026-10-29 20:25:08 loadtest/lab3.py monitoring
+== крок 5: перевірка рядів Prometheus і kubectl top pods
+   запити кожного пода web: 1 рядів
+   лічильник CFS: періоди (cAdvisor): 1 рядів
+   лічильник CFS: дроселювання (cAdvisor): 1 рядів
+   готові репліки (kube-state-metrics): 1 рядів
+   postgres-exporter: 1 рядів
+   зʼєднання з базою за станом: 6 рядів
+   -> results\lab3\monitoring_check.md
+
+#### 2026-10-29 20:26:45 loadtest/lab3.py series
+== крок 7: 1 реплік(и), без автомасштабування
+   поди: web-7d4db69db6-z2twp@k3d-trials-agent-1
+  step  0: target     200 rps  achieved    200.0 rps (100.0 %)
+  step  1: target     400 rps  achieved    400.0 rps (100.0 %)
+  step  2: target     600 rps  achieved    600.0 rps (100.0 %)
+  step  3: target     800 rps  achieved    800.0 rps (100.0 %)
+  step  4: target    1000 rps  achieved   1000.0 rps (100.0 %)
+  step  5: target    1200 rps  achieved   1143.2 rps ( 95.3 %)
+  step  6: target    1400 rps  achieved    438.4 rps ( 31.3 %)
+  step  7: target    1600 rps  achieved    890.7 rps ( 55.7 %)
+  stop: two_steps_below_0.9 after step 7
+   збережено raw/k8s_n1.json, k8s_n1.json.gz
+   X(1) = 1143.2 ± 22.06 rps на сходинці 1200.0; зупинка: two_steps_below_0.9
+== крок 7: 2 реплік(и), без автомасштабування
+   поди: web-7d4db69db6-v4dl8@k3d-trials-agent-0, web-7d4db69db6-z2twp@k3d-trials-agent-1
+  step  0: target     200 rps  achieved    200.0 rps (100.0 %)
+  step  1: target     400 rps  achieved    400.0 rps (100.0 %)
+  step  2: target     600 rps  achieved    600.0 rps (100.0 %)
+  step  3: target     800 rps  achieved    800.0 rps (100.0 %)
+  step  4: target    1000 rps  achieved   1000.0 rps (100.0 %)
+  step  5: target    1200 rps  achieved   1200.0 rps (100.0 %)
+  step  6: target    1400 rps  achieved   1400.0 rps (100.0 %)
+  step  7: target    1600 rps  achieved   1600.2 rps (100.0 %)
+  step  8: target    1800 rps  achieved   1799.8 rps (100.0 %)
+  step  9: target    2000 rps  achieved   1892.2 rps ( 94.6 %)
+  step 10: target    2200 rps  achieved   1498.0 rps ( 68.1 %)
+  step 11: target    2400 rps  achieved    600.0 rps ( 25.0 %)
+  stop: two_steps_below_0.9 after step 11
+   збережено raw/k8s_n2.json, k8s_n2.json.gz
+   X(2) = 1892.2 ± 168.56 rps на сходинці 2000.0; зупинка: two_steps_below_0.9
+== крок 7: 3 реплік(и), без автомасштабування
+   поди: web-7d4db69db6-s9r2s@k3d-trials-agent-1, web-7d4db69db6-v4dl8@k3d-trials-agent-0, web-7d4db69db6-z2twp@k3d-trials-agent-1
+  step  0: target     200 rps  achieved    200.0 rps (100.0 %)
+  step  1: target     400 rps  achieved    400.0 rps (100.0 %)
+  step  2: target     600 rps  achieved    600.0 rps (100.0 %)
+  step  3: target     800 rps  achieved    800.0 rps (100.0 %)
+  step  4: target    1000 rps  achieved   1000.0 rps (100.0 %)
+  step  5: target    1200 rps  achieved   1200.0 rps (100.0 %)
+  step  6: target    1400 rps  achieved   1400.0 rps (100.0 %)
+  step  7: target    1600 rps  achieved   1600.0 rps (100.0 %)
+  step  8: target    1800 rps  achieved   1799.7 rps (100.0 %)
+  step  9: target    2000 rps  achieved   1999.5 rps (100.0 %)
+  step 10: target    2200 rps  achieved   2199.9 rps (100.0 %)
+  step 11: target    2400 rps  achieved   2392.1 rps ( 99.7 %)
+  step 12: target    2600 rps  achieved   2481.9 rps ( 95.5 %)
+  step 13: target    2800 rps  achieved   2314.6 rps ( 82.7 %)
+  step 14: target    3000 rps  achieved   2413.1 rps ( 80.4 %)
+  stop: two_steps_below_0.9 after step 14
+   збережено raw/k8s_n3.json, k8s_n3.json.gz
+   X(3) = 2481.95 ± 167.65 rps на сходинці 2600.0; зупинка: two_steps_below_0.9
+== крок 7: 4 реплік(и), без автомасштабування
+   поди: web-7d4db69db6-l9m5j@k3d-trials-agent-0, web-7d4db69db6-s9r2s@k3d-trials-agent-1, web-7d4db69db6-v4dl8@k3d-trials-agent-0, web-7d4db69db6-z2twp@k3d-trials-agent-1
+  step  0: target     200 rps  achieved    200.0 rps (100.0 %)
+  step  1: target     400 rps  achieved    400.0 rps (100.0 %)
+  step  2: target     600 rps  achieved    600.0 rps (100.0 %)
+  step  3: target     800 rps  achieved    800.0 rps (100.0 %)
+  step  4: target    1000 rps  achieved   1000.0 rps (100.0 %)
+  step  5: target    1200 rps  achieved   1200.0 rps (100.0 %)
+  step  6: target    1400 rps  achieved   1400.0 rps (100.0 %)
+  step  7: target    1600 rps  achieved   1600.2 rps (100.0 %)
+  step  8: target    1800 rps  achieved   1800.1 rps (100.0 %)
+  step  9: target    2000 rps  achieved   2000.1 rps (100.0 %)
+  step 10: target    2200 rps  achieved   2199.7 rps (100.0 %)
+  step 11: target    2400 rps  achieved   2446.8 rps (102.0 %)
+  step 12: target    2600 rps  achieved   2598.8 rps (100.0 %)
+  step 13: target    2800 rps  achieved   2751.7 rps ( 98.3 %)
+  step 14: target    3000 rps  achieved   2642.4 rps ( 88.1 %)
+  step 15: target    3200 rps  achieved   2580.6 rps ( 80.6 %)
+  stop: two_steps_below_0.9 after step 15
+   збережено raw/k8s_n4.json, k8s_n4.json.gz
+   X(4) = 2751.7 ± 196.64 rps на сходинці 2800.0; зупинка: two_steps_below_0.9
+
+#### 2026-10-29 20:56:59 loadtest/lab3.py fixed
+== крок 10: профіль зі стрибком на фіксованих 4 репліках
+   X(1) = 1143.2, X(4) = 2751.7: профіль 30:343,60:2477,90:343 (стрибок = min(2.5·X(1) = 2858, 0.9·X(4) = 2477))
+   збережено raw/prof_fixed.json, prof_fixed.json.gz
+
+#### 2026-10-29 21:01:36 loadtest/lab3.py hpa
+== крок 11: той самий профіль з HPA (ціль 50 %, 1..4, scaleDown 30 с)
+   чекаю, поки HPA показує 1 репліку 60 с поспіль ...
+   NAME   REFERENCE        TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+   web    Deployment/web   cpu: 1%/50%   1         4         1          78s
+   X(1) = 1143.2, X(4) = 2751.7: профіль 30:343,60:2477,90:343 (стрибок = min(2.5·X(1) = 2858, 0.9·X(4) = 2477))
+   збережено raw/prof_hpa.json, prof_hpa.json.gz
+   NAME   REFERENCE        TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+   web    Deployment/web   cpu: 1%/50%   1         4         1          4m26s
+
+#### 2026-10-29 21:06:26 loadtest/lab3.py ingress
+== Д3: дисбаланс на 4 репліках через NodePort і через Ingress (Traefik)
+   ing_nodeport: http://localhost:8080 /healthz -> 200; 1400 rps, 90 с
+   збережено raw/ing_nodeport.json, ing_nodeport.json.gz
+   досягнута 1399.98 rps, p99 7.35 мс, X-Pod: {'web-7d4db69db6-6464g': 340.22, 'web-7d4db69db6-ffltj': 337.37, 'web-7d4db69db6-lpj24': 340.78, 'web-7d4db69db6-z2twp': 381.62}
+   ing_ingress: http://localhost:8081 /healthz -> 200; 1400 rps, 90 с
+   збережено raw/ing_ingress.json, ing_ingress.json.gz
+   досягнута 1400.02 rps, p99 5.62 мс, X-Pod: {'web-7d4db69db6-6464g': 350.0, 'web-7d4db69db6-ffltj': 350.0, 'web-7d4db69db6-lpj24': 350.02, 'web-7d4db69db6-z2twp': 350.0}
+
+#### 2026-10-29 21:21:35 loadtest/lab3.py hpa
+== крок 11: той самий профіль з HPA (ціль 50 %, 1..4, scaleDown 30 с)
+   чекаю, поки HPA показує 1 репліку 60 с поспіль ...
+   NAME   REFERENCE        TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+   web    Deployment/web   cpu: 1%/50%   1         4         1          77s
+   X(1) = 1143.2, X(4) = 2751.7: профіль 30:343,60:2477,90:343 (стрибок = min(2.5·X(1) = 2858, 0.9·X(4) = 2477))
+   збережено raw/prof_hpa.json, prof_hpa.json.gz
+   NAME   REFERENCE        TARGETS        MINPODS   MAXPODS   REPLICAS   AGE
+   web    Deployment/web   cpu: 37%/50%   1         4         3          4m20s

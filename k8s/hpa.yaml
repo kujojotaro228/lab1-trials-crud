@@ -1,0 +1,21 @@
+# Крок 11: HPA за CPU, ціль 50 % від requests.cpu (варіант 25), 1..R = 4 репліки.
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: web
+  namespace: trials
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: web
+  minReplicas: 1
+  maxReplicas: 4
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: {type: Utilization, averageUtilization: 50}
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 30

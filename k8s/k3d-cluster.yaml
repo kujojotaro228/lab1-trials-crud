@@ -1,0 +1,26 @@
+# Кластер ЛР 3 (варіант 25: k3d): 1 server + 2 agent.
+# На server заборонено робочі поди (taint control-plane:NoSchedule); його мітка role=infra
+# (ставить scripts/k8s/deploy.ps1) — для бази і моніторингу.
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: trials
+servers: 1
+agents: 2
+image: rancher/k3s:v1.31.4-k3s1          # >= 1.30: lifecycle.preStop.sleep
+kubeAPI:                                 # API на 127.0.0.1:6550, а не host.docker.internal:
+  host: "127.0.0.1"                      # на Windows ця адреса вказує на IP у локальній
+  hostIP: "127.0.0.1"                    # мережі, і kubectl не може підʼєднатися
+  hostPort: "6550"
+ports:
+  - port: 8080:30080                     # NodePort сервісу web
+    nodeFilters: [loadbalancer]
+  - port: 9090:30090                     # NodePort Prometheus
+    nodeFilters: [loadbalancer]
+  - port: 8081:80                        # Traefik (Ingress, вимога Д3)
+    nodeFilters: [loadbalancer]
+options:
+  k3s:
+    extraArgs:
+      - arg: --node-taint=node-role.kubernetes.io/control-plane=true:NoSchedule
+        nodeFilters: [server:0]

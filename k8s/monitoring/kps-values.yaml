@@ -1,0 +1,52 @@
+# kube-prometheus-stack для ЛР 3: Prometheus (5 с), kubelet/cAdvisor, kube-state-metrics.
+# Усе, що можна, — на вузлі role=infra (server).
+crds:
+  enabled: true
+defaultRules: {create: false}
+grafana: {enabled: false}
+alertmanager: {enabled: false}
+nodeExporter: {enabled: false}
+kubeControllerManager: {enabled: false}
+kubeScheduler: {enabled: false}
+kubeProxy: {enabled: false}
+kubeEtcd: {enabled: false}
+coreDns: {enabled: false}
+kubeApiServer: {enabled: false}
+
+kubelet:
+  enabled: true
+  serviceMonitor:
+    interval: 5s
+    cAdvisor: true            # container_cpu_cfs_* , container_cpu_usage_seconds_total
+    probes: false
+    resource: false
+
+kube-state-metrics:
+  nodeSelector: {role: infra}
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+  prometheus:
+    monitor:
+      interval: 5s
+
+prometheusOperator:
+  nodeSelector: {role: infra}
+  tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+
+prometheus:
+  service:
+    type: NodePort
+    nodePort: 30090
+  prometheusSpec:
+    scrapeInterval: 5s
+    evaluationInterval: 5s
+    retention: 7d
+    nodeSelector: {role: infra}
+    tolerations:
+      - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+    # брати всі ServiceMonitor/PodMonitor кластера, а не лише з міткою релізу
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    resources:
+      requests: {cpu: 200m, memory: 512Mi}

@@ -1,0 +1,415 @@
+{
+ "series": {
+  "1": {
+   "X": 1143.2,
+   "sd": 22.06,
+   "step": 1200.0,
+   "p99_client_ms": 1878.66,
+   "p99_server": {
+    "value_s": 0.09858385093167701,
+    "lo": 0.05,
+    "hi": 0.1,
+    "err_s": 0.05,
+    "beyond": false,
+    "n": 22924.0
+   },
+   "throttle": {
+    "web-7d4db69db6-z2twp": 1.0
+   },
+   "non2xx_pct": 0.0,
+   "reached": true,
+   "pods": [
+    {
+     "pod": "web-7d4db69db6-z2twp",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    }
+   ]
+  },
+  "2": {
+   "X": 1892.2,
+   "sd": 168.56,
+   "step": 2000.0,
+   "p99_client_ms": 2980.72,
+   "p99_server": {
+    "value_s": 0.09131912272055209,
+    "lo": 0.05,
+    "hi": 0.1,
+    "err_s": 0.05,
+    "beyond": false,
+    "n": 37727.0
+   },
+   "throttle": {
+    "web-7d4db69db6-v4dl8": 0.9671052631578947,
+    "web-7d4db69db6-z2twp": 1.0
+   },
+   "non2xx_pct": 0.0,
+   "reached": true,
+   "pods": [
+    {
+     "pod": "web-7d4db69db6-v4dl8",
+     "node": "k3d-trials-agent-0",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-z2twp",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    }
+   ]
+  },
+  "3": {
+   "X": 2481.95,
+   "sd": 167.65,
+   "step": 2600.0,
+   "p99_client_ms": 2090.66,
+   "p99_server": {
+    "value_s": 0.049656255123790786,
+    "lo": 0.025,
+    "hi": 0.05,
+    "err_s": 0.025,
+    "beyond": false,
+    "n": 49886.0
+   },
+   "throttle": {
+    "web-7d4db69db6-s9r2s": 0.8823529411764706,
+    "web-7d4db69db6-v4dl8": 0.9970588235294118,
+    "web-7d4db69db6-z2twp": 0.9949748743718593
+   },
+   "non2xx_pct": 0.0,
+   "reached": true,
+   "pods": [
+    {
+     "pod": "web-7d4db69db6-s9r2s",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-v4dl8",
+     "node": "k3d-trials-agent-0",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-z2twp",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    }
+   ]
+  },
+  "4": {
+   "X": 2751.7,
+   "sd": 196.64,
+   "step": 2800.0,
+   "p99_client_ms": 1638.77,
+   "p99_server": {
+    "value_s": 0.063532754010695,
+    "lo": 0.05,
+    "hi": 0.1,
+    "err_s": 0.05,
+    "beyond": false,
+    "n": 55055.0
+   },
+   "throttle": {
+    "web-7d4db69db6-s9r2s": 0.7096774193548387,
+    "web-7d4db69db6-v4dl8": 0.944078947368421,
+    "web-7d4db69db6-z2twp": 0.9184952978056427,
+    "web-7d4db69db6-l9m5j": 1.0
+   },
+   "non2xx_pct": 0.0,
+   "reached": true,
+   "pods": [
+    {
+     "pod": "web-7d4db69db6-l9m5j",
+     "node": "k3d-trials-agent-0",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-s9r2s",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-v4dl8",
+     "node": "k3d-trials-agent-0",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    },
+    {
+     "pod": "web-7d4db69db6-z2twp",
+     "node": "k3d-trials-agent-1",
+     "phase": "Running",
+     "terminating": false,
+     "ready": true
+    }
+   ]
+  }
+ },
+ "imbalance": {
+  "2": {
+   "I": 1.01985315556498,
+   "I_client": 1.0225663249127999,
+   "rps": {
+    "web-7d4db69db6-v4dl8": 961.9,
+    "web-7d4db69db6-z2twp": 924.45
+   },
+   "x_avg": 943.175,
+   "x_max": 961.9,
+   "hi": "web-7d4db69db6-v4dl8",
+   "lo": "web-7d4db69db6-z2twp"
+  },
+  "3": {
+   "I": 1.0757583052286477,
+   "I_client": 1.0772779467757208,
+   "rps": {
+    "web-7d4db69db6-v4dl8": 894.5394581259992,
+    "web-7d4db69db6-z2twp": 858.278742711777,
+    "web-7d4db69db6-s9r2s": 741.8112724690614
+   },
+   "x_avg": 831.5431577689459,
+   "x_max": 894.5394581259992,
+   "hi": "web-7d4db69db6-v4dl8",
+   "lo": "web-7d4db69db6-s9r2s"
+  },
+  "4": {
+   "I": 1.0486247392503096,
+   "I_client": 1.0592724497583315,
+   "rps": {
+    "web-7d4db69db6-v4dl8": 720.7720805762285,
+    "web-7d4db69db6-l9m5j": 671.8835917447063,
+    "web-7d4db69db6-z2twp": 721.7221755901697,
+    "web-7d4db69db6-s9r2s": 638.6457975395971
+   },
+   "x_avg": 688.2559113626754,
+   "x_max": 721.7221755901697,
+   "hi": "web-7d4db69db6-z2twp",
+   "lo": "web-7d4db69db6-s9r2s"
+  }
+ },
+ "usl": {
+  "k8s": {
+   "X": {
+    "1": 1143.2,
+    "2": 1892.2,
+    "3": 2481.95,
+    "4": 2751.7
+   },
+   "sd": {
+    "1": 22.06,
+    "2": 168.56,
+    "3": 167.65,
+    "4": 196.64
+   },
+   "fit": {
+    "rows": [
+     {
+      "N": 2,
+      "X": 1892.2,
+      "C": 1.6551784464660602,
+      "u": 1,
+      "v": 2,
+      "y": 0.20832892928865876
+     },
+     {
+      "N": 3,
+      "X": 2481.95,
+      "C": 2.171054933519944,
+      "u": 2,
+      "v": 6,
+      "y": 0.38181671669453476
+     },
+     {
+      "N": 4,
+      "X": 2751.7,
+      "C": 2.4070153953813853,
+      "u": 3,
+      "v": 12,
+      "y": 0.6618090634880258
+     }
+    ],
+    "sums": {
+     "Σu²": 14,
+     "Σv²": 184,
+     "Σuv": 50,
+     "Σuy": 2.9573895531418057,
+     "Σvy": 10.649266920600835,
+     "det": 76
+    },
+    "lambda": 1143.2,
+    "raw": {
+     "sigma": 0.15389910194803305,
+     "kappa": 0.016056042517386748
+    },
+    "sigma": 0.15389910194803305,
+    "kappa": 0.016056042517386748,
+    "N_star": 7.259251169981671
+   }
+  },
+  "compose": {
+   "X": {
+    "1": 1214.8,
+    "2": 1999.0,
+    "3": 2200.07,
+    "4": 2400.0
+   },
+   "sd": {
+    "1": 33.72,
+    "2": 32.22,
+    "3": 9.11,
+    "4": 25.16
+   },
+   "fit": {
+    "rows": [
+     {
+      "N": 2,
+      "X": 1999.0,
+      "C": 1.6455383602239053,
+      "u": 1,
+      "v": 2,
+      "y": 0.21540770385192576
+     },
+     {
+      "N": 3,
+      "X": 2200.07,
+      "C": 1.8110553177477775,
+      "u": 2,
+      "v": 6,
+      "y": 0.6564927479580194
+     },
+     {
+      "N": 4,
+      "X": 2400.0,
+      "C": 1.975633849193283,
+      "u": 3,
+      "v": 12,
+      "y": 1.0246666666666666
+     }
+    ],
+    "sums": {
+     "Σu²": 14,
+     "Σv²": 184,
+     "Σuv": 50,
+     "Σuy": 4.602393199767964,
+     "Σvy": 16.665771895451968,
+     "det": 76
+    },
+    "lambda": 1214.8,
+    "raw": {
+     "sigma": 0.1783125524303557,
+     "kappa": 0.042120349314859744
+    },
+    "sigma": 0.1783125524303557,
+    "kappa": 0.042120349314859744,
+    "N_star": 4.416796033972967
+   }
+  }
+ },
+ "elastic": {
+  "fixed": {
+   "T": 180,
+   "theta_U": 0.0,
+   "theta_O": 1.0,
+   "a_U": 0.0,
+   "a_O": 2.3333333333333335,
+   "W": 720.0,
+   "violations": 63,
+   "non2xx": 0,
+   "connerr": 0,
+   "threshold_ms": 8.44
+  },
+  "hpa": {
+   "T": 180,
+   "theta_U": 0.17222222222222222,
+   "theta_O": 0.6333333333333333,
+   "a_U": 0.20555555555555555,
+   "a_O": 1.4444444444444444,
+   "W": 523.0,
+   "violations": 66,
+   "non2xx": 27358,
+   "connerr": 0,
+   "threshold_ms": 8.44
+  }
+ },
+ "hpa_times": {
+  "desired_first_change_s": "25.6 с",
+  "max_ready": 4.0,
+  "max_ready_s": "35.6 с",
+  "p99_recovered_s": "не досягнуто",
+  "p99_limit_ms": 321.66,
+  "first_scale_down_s": "55.6 с"
+ },
+ "d3": [
+  {
+   "via": "NodePort (:8080)",
+   "rate": 1400.0,
+   "achieved": 1399.98,
+   "p99_client": 7.35,
+   "p99_server": {
+    "value_s": 0.004967543137395289,
+    "lo": 0.0,
+    "hi": 0.005,
+    "err_s": 0.005,
+    "beyond": false,
+    "n": 84099.0
+   },
+   "I": 1.0976321607770203,
+   "I_client": 1.0903506453617526,
+   "rps": {
+    "web-7d4db69db6-6464g": 342.4618724759005,
+    "web-7d4db69db6-ffltj": 338.2115182716099,
+    "web-7d4db69db6-lpj24": 336.42803631137815,
+    "web-7d4db69db6-z2twp": 384.6525660961437
+   },
+   "thr": {
+    "web-7d4db69db6-ffltj": 0.0784313725490196,
+    "web-7d4db69db6-z2twp": 0.0951219512195122,
+    "web-7d4db69db6-6464g": 0.0940959409594096,
+    "web-7d4db69db6-lpj24": 0.058091286307053944
+   }
+  },
+  {
+   "via": "Ingress Traefik (:8081)",
+   "rate": 1400.0,
+   "achieved": 1400.02,
+   "p99_client": 5.62,
+   "p99_server": {
+    "value_s": 0.00495117896441671,
+    "lo": 0.0,
+    "hi": 0.005,
+    "err_s": 0.005,
+    "beyond": false,
+    "n": 83992.0
+   },
+   "I": 1.000000001986954,
+   "I_client": 1.000042856530621,
+   "rps": {
+    "web-7d4db69db6-6464g": 349.98999903287006,
+    "web-7d4db69db6-ffltj": 349.99000042369806,
+    "web-7d4db69db6-lpj24": 349.98999903287006,
+    "web-7d4db69db6-z2twp": 349.99000042369806
+   },
+   "thr": {
+    "web-7d4db69db6-ffltj": 0.0,
+    "web-7d4db69db6-z2twp": 0.0,
+    "web-7d4db69db6-6464g": 0.002036659877800407,
+    "web-7d4db69db6-lpj24": 0.0
+   }
+  }
+ ]
+}

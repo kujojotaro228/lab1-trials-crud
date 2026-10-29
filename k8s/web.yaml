@@ -1,0 +1,59 @@
+# Сервіс web. Поля replicas немає: кількість задає kubectl scale або HPA,
+# і повторне застосування маніфесту її не скидає.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: trials
+  labels: {app: web}
+spec:
+  selector:
+    matchLabels: {app: web}
+  template:
+    metadata:
+      labels: {app: web}
+    spec:
+      terminationGracePeriodSeconds: 15
+      containers:
+        - name: web
+          image: trials-web:lab3
+          imagePullPolicy: Never
+          ports:
+            - {name: http, containerPort: 8000}
+          envFrom:
+            - configMapRef: {name: web-config}
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: db-secret, key: POSTGRES_PASSWORD}
+            - name: POD_NAME                       # Downward API -> заголовок X-Pod
+              valueFrom:
+                fieldRef: {fieldPath: metadata.name}
+          resources:
+            requests: {cpu: 250m, memory: 128Mi}   # варіант 25: 250m / 500m
+            limits: {cpu: 500m, memory: 512Mi}
+          readinessProbe:
+            httpGet: {path: /healthz, port: http}
+            timeoutSeconds: 3
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: {path: /livez, port: http}
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6                    # 60 с: не перезапускати под під час перевантаження
+          lifecycle:
+            preStop:
+              sleep: {seconds: 5}                  # час kube-proxy прибрати под з маршрутів
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: trials
+  labels: {app: web}
+spec:
+  type: NodePort
+  selector: {app: web}
+  ports:
+    - {name: http, port: 8000, targetPort: http, nodePort: 30080}
