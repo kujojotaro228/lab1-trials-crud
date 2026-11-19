@@ -1,0 +1,81 @@
+host_time	pod	deletionTimestamp	exitCode	reason	finishedAt	lastExitCode	restarts
+2026-11-19 20:00:01	worker-7d87b58fb5-24hdd                                 0
+2026-11-19 20:00:01	worker-7d87b58fb5-mg7wr                                 0
+2026-11-19 20:00:01	worker-7d87b58fb5-mrvz4                                 0
+2026-11-19 20:00:01	worker-7d87b58fb5-zxnc5                                 0
+2026-11-19 20:00:03	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:00:03Z         0
+2026-11-19 20:00:03	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:00:02Z         0
+2026-11-19 20:00:03	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:00:02Z         0
+2026-11-19 20:00:03	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:00:03Z         0
+2026-11-19 20:00:04	worker-7d87b58fb5-24hdd                                              1     1
+2026-11-19 20:00:04	worker-7d87b58fb5-mrvz4                                              1     1
+2026-11-19 20:00:04	worker-7d87b58fb5-zxnc5                                              1     1
+2026-11-19 20:00:04	worker-7d87b58fb5-mg7wr                                              1     1
+2026-11-19 20:00:05	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:00:04Z   1     1
+2026-11-19 20:00:05	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:00:04Z   1     1
+2026-11-19 20:00:05	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:00:05Z   1     1
+2026-11-19 20:00:05	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:00:05Z   1     1
+2026-11-19 20:00:16	worker-7d87b58fb5-zxnc5                                              1     1
+2026-11-19 20:00:16	worker-7d87b58fb5-mrvz4                                              1     1
+2026-11-19 20:00:16	worker-7d87b58fb5-zxnc5                                              1     2
+2026-11-19 20:00:17	worker-7d87b58fb5-mrvz4                                              1     2
+2026-11-19 20:00:18	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:00:18Z   1     2
+2026-11-19 20:00:18	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:00:17Z   1     2
+2026-11-19 20:00:19	worker-7d87b58fb5-24hdd                                              1     1
+2026-11-19 20:00:20	worker-7d87b58fb5-24hdd                                              1     2
+2026-11-19 20:00:21	worker-7d87b58fb5-mg7wr                                              1     1
+2026-11-19 20:00:21	worker-7d87b58fb5-mg7wr                                              1     2
+2026-11-19 20:00:22	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:00:21Z   1     2
+2026-11-19 20:00:23	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:00:22Z   1     2
+2026-11-19 20:00:33	worker-7d87b58fb5-zxnc5                                              1     2
+2026-11-19 20:00:33	worker-7d87b58fb5-mrvz4                                              1     2
+2026-11-19 20:00:33	worker-7d87b58fb5-24hdd                                              1     2
+2026-11-19 20:00:36	worker-7d87b58fb5-mg7wr                                              1     2
+2026-11-19 20:00:45	worker-7d87b58fb5-24hdd                                              1     3
+2026-11-19 20:00:46	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:00:46Z   1     3
+2026-11-19 20:00:47	worker-7d87b58fb5-mrvz4                                              1     3
+2026-11-19 20:00:48	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:00:48Z   1     3
+2026-11-19 20:00:48	worker-7d87b58fb5-zxnc5                                              1     3
+2026-11-19 20:00:49	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:00:49Z   1     3
+2026-11-19 20:00:51	worker-7d87b58fb5-mg7wr                                              1     3
+2026-11-19 20:00:52	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:00:52Z   1     3
+2026-11-19 20:01:01	worker-7d87b58fb5-24hdd                                              1     3
+2026-11-19 20:01:02	worker-7d87b58fb5-mrvz4                                              1     3
+2026-11-19 20:01:04	worker-7d87b58fb5-mg7wr                                              1     3
+2026-11-19 20:01:05	worker-7d87b58fb5-zxnc5                                              1     3
+2026-11-19 20:01:28	worker-7d87b58fb5-24hdd                                              1     4
+2026-11-19 20:01:29	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:01:28Z   1     4
+2026-11-19 20:01:30	worker-7d87b58fb5-zxnc5                                              1     4
+2026-11-19 20:01:32	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:01:31Z   1     4
+2026-11-19 20:01:41	worker-7d87b58fb5-mrvz4                                              1     4
+2026-11-19 20:01:42	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:01:42Z   1     4
+2026-11-19 20:01:42	worker-7d87b58fb5-24hdd                                              1     4
+2026-11-19 20:01:43	worker-7d87b58fb5-mg7wr                                              1     4
+2026-11-19 20:01:44	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:01:44Z   1     4
+2026-11-19 20:01:46	worker-7d87b58fb5-zxnc5                                              1     4
+2026-11-19 20:01:57	worker-7d87b58fb5-mg7wr                                              1     4
+2026-11-19 20:01:57	worker-7d87b58fb5-mrvz4                                              1     4
+2026-11-19 20:02:50	worker-7d87b58fb5-24hdd                                              1     5
+2026-11-19 20:02:51	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:02:51Z   1     5
+2026-11-19 20:03:01	worker-7d87b58fb5-zxnc5                                              1     5
+2026-11-19 20:03:02	worker-7d87b58fb5-24hdd                                              1     5
+2026-11-19 20:03:03	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:03:03Z   1     5
+2026-11-19 20:03:08	worker-7d87b58fb5-mrvz4                                              1     5
+2026-11-19 20:03:09	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:03:08Z   1     5
+2026-11-19 20:03:12	worker-7d87b58fb5-mg7wr                                              1     5
+2026-11-19 20:03:13	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:03:13Z   1     5
+2026-11-19 20:03:14	worker-7d87b58fb5-zxnc5                                              1     5
+2026-11-19 20:03:21	worker-7d87b58fb5-mrvz4                                              1     5
+2026-11-19 20:03:28	worker-7d87b58fb5-mg7wr                                              1     5
+2026-11-19 20:05:33	worker-7d87b58fb5-24hdd                                              1     6
+2026-11-19 20:05:35	worker-7d87b58fb5-24hdd         1     Error   2026-11-19T19:05:34Z   1     6
+2026-11-19 20:05:46	worker-7d87b58fb5-24hdd                                              1     6
+2026-11-19 20:05:50	worker-7d87b58fb5-zxnc5                                              1     6
+2026-11-19 20:05:52	worker-7d87b58fb5-zxnc5         1     Error   2026-11-19T19:05:51Z   1     6
+2026-11-19 20:05:53	worker-7d87b58fb5-mrvz4                                              1     6
+2026-11-19 20:05:55	worker-7d87b58fb5-mg7wr                                              1     6
+2026-11-19 20:05:55	worker-7d87b58fb5-mrvz4         1     Error   2026-11-19T19:05:54Z   1     6
+2026-11-19 20:05:57	worker-7d87b58fb5-mg7wr         1     Error   2026-11-19T19:05:56Z   1     6
+2026-11-19 20:06:06	worker-7d87b58fb5-zxnc5                                              1     6
+2026-11-19 20:06:10	worker-7d87b58fb5-mg7wr                                              1     6
+2026-11-19 20:06:11	worker-7d87b58fb5-mrvz4                                              1     6

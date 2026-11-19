@@ -1,0 +1,59 @@
+{
+ "task_id": 19,
+ "before": [
+  "19",
+  "1",
+  "1",
+  "running",
+  "worker-7f87c4cfbc-smtwz",
+  "1795113424.840510"
+ ],
+ "after": [
+  "done",
+  "2",
+  "2",
+  "worker-7f87c4cfbc-whk8h",
+  "1795113428.088744"
+ ],
+ "mid": [
+  "done",
+  "2",
+  "2",
+  "worker-7f87c4cfbc-whk8h"
+ ],
+ "stopped_pod": "worker-7f87c4cfbc-smtwz",
+ "other_pod": "worker-7f87c4cfbc-whk8h",
+ "t_stop": 1795113410.036777,
+ "t_cont": 1795113440.927552,
+ "results_rows": 1,
+ "zero_rows_lines": [
+  {
+   "ts": "2026-11-19T18:37:20.770+00:00",
+   "worker": "worker-7f87c4cfbc-smtwz",
+   "event": "zero_rows",
+   "op": "heartbeat",
+   "task_id": 19,
+   "token": 1,
+   "msg": "heartbeat оновив 0 рядків: задача вже не належить цьому воркеру",
+   "pod": "worker-7f87c4cfbc-smtwz"
+  },
+  {
+   "ts": "2026-11-19T18:37:20.774+00:00",
+   "worker": "worker-7f87c4cfbc-smtwz",
+   "event": "zero_rows",
+   "op": "store",
+   "task_id": 19,
+   "token": 1,
+   "msg": "завершення оновило 0 рядків: токен застарів, результат не записано",
+   "pod": "worker-7f87c4cfbc-smtwz"
+  }
+ ],
+ "statuses": {
+  "done": 100
+ },
+ "multi_result": 0,
+ "pid1_demo": {
+  "before": 27,
+  "after": 107
+ }
+}

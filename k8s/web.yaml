@@ -1,5 +1,5 @@
-# Сервіс web. Поля replicas немає: кількість задає kubectl scale або HPA,
-# і повторне застосування маніфесту її не скидає.
+# web service. No replicas field: the count is set by kubectl scale or the HPA,
+# and re-applying the manifest does not reset it.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,7 +16,7 @@ spec:
       terminationGracePeriodSeconds: 15
       containers:
         - name: web
-          image: trials-web:lab3
+          image: trials-web:lab4
           imagePullPolicy: Never
           ports:
             - {name: http, containerPort: 8000}
@@ -26,11 +26,11 @@ spec:
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef: {name: db-secret, key: POSTGRES_PASSWORD}
-            - name: POD_NAME                       # Downward API -> заголовок X-Pod
+            - name: POD_NAME                       # Downward API -> X-Pod header
               valueFrom:
                 fieldRef: {fieldPath: metadata.name}
           resources:
-            requests: {cpu: 250m, memory: 128Mi}   # варіант 25: 250m / 500m
+            requests: {cpu: 250m, memory: 128Mi}   # variant 25: 250m / 500m
             limits: {cpu: 500m, memory: 512Mi}
           readinessProbe:
             httpGet: {path: /healthz, port: http}
@@ -41,10 +41,10 @@ spec:
             httpGet: {path: /livez, port: http}
             periodSeconds: 10
             timeoutSeconds: 5
-            failureThreshold: 6                    # 60 с: не перезапускати под під час перевантаження
+            failureThreshold: 6                    # 60 s: do not restart the pod while it is overloaded
           lifecycle:
             preStop:
-              sleep: {seconds: 5}                  # час kube-proxy прибрати под з маршрутів
+              sleep: {seconds: 5}                  # time for kube-proxy to remove the pod from routing
 ---
 apiVersion: v1
 kind: Service

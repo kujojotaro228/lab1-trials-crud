@@ -1,0 +1,224 @@
+{
+ "nopoison": {
+  "t_from": 1795116523.407632,
+  "t_scenario": 1795116548.407632,
+  "t_to": 1795116640.246954,
+  "counts_drained": {
+   "queued": 0,
+   "running": 0,
+   "done": 120,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 120
+  },
+  "container_exits": {
+   "1": 18
+  },
+  "crash_timeline": {
+   "worker-7d87b58fb5-5n75b": {
+    "exits": 4,
+    "gaps_s": [
+     5,
+     17,
+     28
+    ]
+   },
+   "worker-7d87b58fb5-76bw4": {
+    "exits": 5,
+    "gaps_s": [
+     6,
+     16,
+     25,
+     43
+    ]
+   },
+   "worker-7d87b58fb5-gd977": {
+    "exits": 5,
+    "gaps_s": [
+     5,
+     14,
+     29,
+     41
+    ]
+   },
+   "worker-7d87b58fb5-wqfv7": {
+    "exits": 4,
+    "gaps_s": [
+     11,
+     15,
+     31
+    ]
+   }
+  },
+  "restarts": {
+   "worker-7d87b58fb5-5n75b": 4,
+   "worker-7d87b58fb5-76bw4": 4,
+   "worker-7d87b58fb5-gd977": 4,
+   "worker-7d87b58fb5-wqfv7": 4
+  },
+  "restarts_total": 16,
+  "total": 120,
+  "statuses": {
+   "done": 120
+  },
+  "failed": 0,
+  "multi_result": 0,
+  "attempts_gt1": 14,
+  "attempts_dist": {
+   "1": 106,
+   "2": 10,
+   "3": 4
+  },
+  "n_normal": 120,
+  "share_attempts_gt1": 0.11666666666666667,
+  "share_failed": 0.0,
+  "mean_attempts_done": 1.15,
+  "wait_p50_s": 26.274179935455322,
+  "wait_p99_s": 69.06597995758057,
+  "X_done_per_s": 1.0270514934371202
+ },
+ "poison": {
+  "t_from": 1795116653.167006,
+  "t_scenario": 1795116678.765713,
+  "t_to": 1795116860.030616,
+  "counts_drained": {
+   "queued": 0,
+   "running": 0,
+   "done": 120,
+   "failed": 10,
+   "cancelled": 0,
+   "total": 130
+  },
+  "container_exits": {
+   "1": 21
+  },
+  "crash_timeline": {
+   "worker-7d87b58fb5-4j85r": {
+    "exits": 5,
+    "gaps_s": [
+     10,
+     16,
+     28,
+     52
+    ]
+   },
+   "worker-7d87b58fb5-cvt5g": {
+    "exits": 6,
+    "gaps_s": [
+     15,
+     12,
+     30,
+     42,
+     89
+    ]
+   },
+   "worker-7d87b58fb5-ftqmx": {
+    "exits": 5,
+    "gaps_s": [
+     10,
+     17,
+     27,
+     42
+    ]
+   },
+   "worker-7d87b58fb5-wxsbq": {
+    "exits": 5,
+    "gaps_s": [
+     5,
+     20,
+     28,
+     54
+    ]
+   }
+  },
+  "restarts": {
+   "worker-7d87b58fb5-4j85r": 5,
+   "worker-7d87b58fb5-cvt5g": 5,
+   "worker-7d87b58fb5-ftqmx": 5,
+   "worker-7d87b58fb5-wxsbq": 5
+  },
+  "restarts_total": 20,
+  "total": 130,
+  "statuses": {
+   "done": 120,
+   "failed": 10
+  },
+  "failed": 10,
+  "multi_result": 0,
+  "attempts_gt1": 28,
+  "attempts_dist": {
+   "1": 102,
+   "2": 15,
+   "3": 13
+  },
+  "n_normal": 120,
+  "share_attempts_gt1": 0.15,
+  "share_failed": 0.0,
+  "mean_attempts_done": 1.175,
+  "wait_p50_s": 1.7838349342346191,
+  "wait_p99_s": 147.6295030117035,
+  "X_done_per_s": 0.5800923612570107,
+  "poison": [
+   {
+    "id": "73",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 9.964243173599243
+   },
+   {
+    "id": "74",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.001520156860352
+   },
+   {
+    "id": "75",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.016499042510986
+   },
+   {
+    "id": "76",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.031168222427368
+   },
+   {
+    "id": "77",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.044395923614502
+   },
+   {
+    "id": "78",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.056475162506104
+   },
+   {
+    "id": "79",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.068926811218262
+   },
+   {
+    "id": "80",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.081708908081055
+   },
+   {
+    "id": "81",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.095071077346802
+   },
+   {
+    "id": "82",
+    "status": "failed",
+    "attempts": "3",
+    "created_to_final_s": 10.107348918914795
+   }
+  ]
+ }
+}

@@ -1,0 +1,4 @@
+t_s,step,target_rps,sent_rps,achieved_rps,ok,non2xx,timeouts,connerr,p50_ms,p95_ms,p99_ms,send_lag_p99_ms,pods,gen_cpu_cores
+0,0,100.0,100,100,100,0,0,0,3.757,4.891,18.07,12.315,"{""web-6444ff675d-d5drl"": 50, ""web-6444ff675d-tx9nm"": 50}",0.062
+1,0,100.0,100,100,100,0,0,0,3.733,4.743,5.134,1.128,"{""web-6444ff675d-d5drl"": 50, ""web-6444ff675d-tx9nm"": 50}",0.062
+2,0,100.0,100,100,100,0,0,0,3.832,4.703,5.013,1.277,"{""web-6444ff675d-d5drl"": 50, ""web-6444ff675d-tx9nm"": 50}",0.047

@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
-"""Ступінчастий генератор навантаження у відкритому контурі (ЛР 2, крок 5).
+"""Open-loop step load generator (Lab 2, step 5).
 
-Профіль: прогрів --warmup с на рівні --warmup-rate, далі сходинки по --step-dur с
-від --start з приростом --step запитів за секунду. Прогін зупиняється, коли на двох
-сходинках поспіль досягнута інтенсивність нижча за 0.9 заданої, або після
-сходинки, задана інтенсивність якої досягла межі генератора --gen-limit (G).
+Profile: warm-up of --warmup s at --warmup-rate, then steps of --step-dur s
+starting at --start and growing by --step requests per second. The run stops when
+the achieved rate is below 0.9 of the target on two consecutive steps, or after the
+step whose target rate reached the generator limit --gen-limit (G).
 
-Посекундно записуються: задана інтенсивність, фактична інтенсивність
-надсилання, досягнута інтенсивність (2xx, завершені в цю секунду), кількість
-відповідей 2xx і не 2xx, помилки зʼєднання, p50/p95/p99 клієнта.
+Recorded per second: target rate, actual send rate, achieved rate (2xx completed
+in that second), number of 2xx and non-2xx responses, connection errors,
+client p50/p95/p99.
 
-* Затримка рахується від ЗАПЛАНОВАНОГО моменту надсилання до відповіді.
-* Тайм-аут запиту 5 с; запит, що перевищив тайм-аут, — відповідь не 2xx.
-* Клієнт асинхронний (asyncio, власний мінімальний HTTP/1.1 з keep-alive): запит
-  відправляється в запланований момент незалежно від того, скільки попередніх
-  ще чекають відповіді; для нього береться вільне зʼєднання або відкривається нове.
-* Навантаження ділиться між --procs процесами (кожен — свій цикл подій).
+* Latency is measured from the SCHEDULED send moment to the response.
+* Request timeout 5 s; a request that exceeds the timeout is a non-2xx response.
+* The client is asynchronous (asyncio, own minimal HTTP/1.1 with keep-alive): a request
+  is sent at its scheduled moment regardless of how many earlier ones are still
+  waiting for a response; it takes a free connection or opens a new one.
+* The load is split between --procs processes (each with its own event loop).
 
-Приклади:
-  py loadtest/stepgen.py --target noop --name step_noop             # межа G
-  py loadtest/stepgen.py --gen-limit 2600 --name step_n1             # сервіс
+Examples:
+  py loadtest/stepgen.py --target noop --name step_noop             # limit G
+  py loadtest/stepgen.py --gen-limit 2600 --name step_n1             # the service
 """
 from __future__ import annotations
 
@@ -49,13 +49,13 @@ pc = time.perf_counter
 
 
 # --------------------------------------------------------------------------
-# Профіль
+# Profile
 # --------------------------------------------------------------------------
 class Profile:
-    """Ступінчастий профіль (прогрів + сходинки) або профіль з відрізків.
+    """Step profile (warm-up + steps) or a segment profile.
 
-    segments — список [тривалість, інтенсивність]; якщо задано, прогріву немає,
-    а «сходинка» k — це k-й відрізок (ЛР 3, крок 10).
+    segments — a list of [duration, rate]; if given, there is no warm-up,
+    and "step" k is the k-th segment (Lab 3, step 10).
     """
 
     def __init__(self, warmup: float, warmup_rate: float, start: float, step: float,
@@ -72,7 +72,7 @@ class Profile:
         self.max_steps = max_steps
 
     def step_of(self, t: float) -> int:
-        """-1 — прогрів, k ≥ 0 — номер сходинки (відрізка)."""
+        """-1 — warm-up, k ≥ 0 — step (segment) number."""
         if self.segments:
             for k, (a, b) in enumerate(self._bounds):
                 if t < b:
@@ -107,7 +107,7 @@ class Profile:
 
 
 # --------------------------------------------------------------------------
-# Мінімальний HTTP/1.1-клієнт (GET, keep-alive)
+# Minimal HTTP/1.1 client (GET, keep-alive)
 # --------------------------------------------------------------------------
 class HttpConn(asyncio.Protocol):
     __slots__ = ("transport", "buf", "fut", "closed", "pool", "nreq")
@@ -167,8 +167,9 @@ class HttpConn(asyncio.Protocol):
             total = body_start + clen
             if len(self.buf) < total:
                 return
+        body = bytes(self.buf[body_start:total]) if not chunked else b""
         del self.buf[:total]
-        self.fut.set_result((status, keep, pod))
+        self.fut.set_result((status, keep, pod, body))
 
 
 class ConnPool:
@@ -191,10 +192,10 @@ class ConnPool:
             try:
                 return await fut
             except asyncio.CancelledError:
-                # Тайм-аут запиту (wait_for) міг настати вже після того, як release()
-                # передав цьому очікувачу зʼєднання. Тоді зʼєднання треба повернути в
-                # пул, інакше місце в пулі втрачається назавжди: під тривалим
-                # перевантаженням усі місця «витікають», і генератор зупиняється.
+                # The request timeout (wait_for) may have fired after release() had already
+                # handed a connection to this waiter. Then the connection must go back to the
+                # pool, otherwise the pool slot is lost forever: under sustained
+                # overload all slots "leak" and the generator stalls.
                 if fut.done() and not fut.cancelled() and fut.exception() is None:
                     self.release(fut.result(), True)
                 raise
@@ -212,7 +213,7 @@ class ConnPool:
             if c.transport is not None:
                 c.transport.close()
             self.open -= 1
-            # місце звільнилось — відкриємо нове зʼєднання для того, хто чекає
+            # a slot was freed — open a new connection for whoever is waiting
             while self.waiters:
                 w = self.waiters.popleft()
                 if not w.done():
@@ -240,7 +241,7 @@ class ConnPool:
 
 
 # --------------------------------------------------------------------------
-# Робочий процес
+# Worker process
 # --------------------------------------------------------------------------
 def _raise_fd_limit() -> None:
     try:
@@ -253,7 +254,7 @@ def _raise_fd_limit() -> None:
 
 
 class Stats:
-    """Посекундні лічильники процесу; індекс секунди відраховується від t0."""
+    """Per-second counters of a process; the second index is counted from t0."""
 
     def __init__(self):
         self.sent = defaultdict(int)
@@ -261,11 +262,13 @@ class Stats:
         self.non2xx = defaultdict(int)
         self.connerr = defaultdict(int)
         self.timeouts = defaultdict(int)
-        self.lat = defaultdict(list)          # затримки завершених запитів, с
-        self.lag = defaultdict(list)          # запізнення відправки відносно розкладу, с
+        self.lat = defaultdict(list)          # latencies of completed requests, s
+        self.lag = defaultdict(list)          # send lag relative to the schedule, s
         self.ok_dirty: dict[int, int] = defaultdict(int)
         self.pods = defaultdict(int)
-        self.pod_sec = defaultdict(lambda: defaultdict(int))   # секунда -> под -> 2xx
+        self.codes = defaultdict(int)          # HTTP status -> count
+        self.created = []                      # Lab 4: (task_id, scheduled, response, status)
+        self.pod_sec = defaultdict(lambda: defaultdict(int))   # second -> pod -> 2xx
         self.max_inflight = 0
 
 
@@ -275,16 +278,23 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
     loop = asyncio.get_running_loop()
     pool = ConnPool(cfg["host"], cfg["port"], cfg["max_conns"] // nprocs)
     rnd = random.Random(cfg["seed"] * 1000 + idx)
-    paths = ([cfg["prefix"] + "/noop"] if cfg["target"] == "noop"
-             else [f"{cfg['prefix']}{RESOURCE}/{i}" for i in ids])
-    reqs = [f"GET {p} HTTP/1.1\r\nHost: {cfg['host']}:{cfg['port']}\r\n"
-            f"User-Agent: stepgen\r\nAccept: */*\r\n\r\n".encode() for p in paths]
+    if cfg["target"] == "task":
+        # Lab 4: creating processing tasks POST /trial-participants/{id}/tasks
+        reqs = [f"POST {cfg['prefix']}{RESOURCE}/{i}/tasks HTTP/1.1\r\n"
+                f"Host: {cfg['host']}:{cfg['port']}\r\nUser-Agent: stepgen\r\n"
+                f"Content-Length: 0\r\nAccept: */*\r\n\r\n".encode() for i in ids]
+    else:
+        paths = ([cfg["prefix"] + "/noop"] if cfg["target"] == "noop"
+                 else [f"{cfg['prefix']}{RESOURCE}/{i}" for i in ids])
+        reqs = [f"GET {p} HTTP/1.1\r\nHost: {cfg['host']}:{cfg['port']}\r\n"
+                f"User-Agent: stepgen\r\nAccept: */*\r\n\r\n".encode() for p in paths]
+    want_body = cfg["target"] == "task"
     st = Stats()
     timeout = cfg["timeout"]
     rpc = int(cfg.get("reqs_per_conn") or 0)
     inflight = 0
 
-    # перехід від perf_counter до «секунд від t0»: t0 задано настінним годинником
+    # conversion from perf_counter to "seconds since t0": t0 is set by the wall clock
     pc0 = pc() - (time.time() - t0_wall)
 
     async def one(sched_rel: float, req: bytes) -> None:
@@ -299,7 +309,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                 wait = timeout - (pc() - pc0 - sched_rel)
                 conn = await asyncio.wait_for(pool.acquire(), max(0.001, wait))
                 remaining = timeout - (pc() - pc0 - sched_rel)
-                if remaining <= 0:              # зʼєднання дісталось уже після тайм-ауту
+                if remaining <= 0:              # the connection arrived after the timeout
                     reusable = True
                     raise asyncio.TimeoutError
                 fut = loop.create_future()
@@ -307,22 +317,32 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                 conn.transport.write(req)
                 st.lag[int(sched_rel)].append(pc() - pc0 - sched_rel)
                 try:
-                    status, keep, pod = await asyncio.wait_for(asyncio.shield(fut), remaining)
+                    status, keep, pod, body = await asyncio.wait_for(asyncio.shield(fut),
+                                                                     remaining)
                 except asyncio.TimeoutError:
-                    # Відповідь не прийшла за тайм-аут: запит зараховано як не 2xx, але
-                    # зʼєднання не закривається — його дочитує окрема задача і повертає в
-                    # пул. Так генератор справді тримає сталу кількість зʼєднань, а сервер
-                    # не виконує марно роботу для вже закритих зʼєднань.
+                    # No response within the timeout: the request counts as non-2xx, but
+                    # the connection is not closed — a separate task drains it and returns it to
+                    # the pool. This way the generator really keeps a constant number of connections,
+                    # and the server does not waste work on already closed connections.
                     asyncio.ensure_future(drain(conn, fut))
                     conn = None
                     raise
                 conn.nreq += 1
-                # модель зʼєднань ЛР 3: після reqs_per_conn запитів зʼєднання
-                # закривається, замість нього відкривається нове
+                # Lab 3 connection model: after reqs_per_conn requests the connection
+                # is closed and a new one is opened instead
                 reusable = keep and (rpc <= 0 or conn.nreq < rpc)
                 now = pc() - pc0
                 sec = int(now)
                 st.lat[sec].append(now - sched_rel)
+                st.codes[status] += 1
+                if want_body:
+                    tid = None
+                    if 200 <= status < 300:
+                        try:
+                            tid = json.loads(body)["id"]
+                        except (ValueError, KeyError, TypeError):
+                            tid = None
+                    st.created.append((tid, round(sched_rel, 4), round(now, 4), status))
                 if 200 <= status < 300:
                     st.ok[sec] += 1
                     st.ok_dirty[sec] += 1
@@ -334,7 +354,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
             except asyncio.TimeoutError:
                 now = pc() - pc0
                 sec = int(now)
-                st.non2xx[sec] += 1               # тайм-аут = відповідь не 2xx
+                st.non2xx[sec] += 1               # timeout = non-2xx response
                 st.timeouts[sec] += 1
                 st.lat[sec].append(now - sched_rel)
             except (OSError, ConnectionError):
@@ -349,7 +369,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
     async def drain(conn: HttpConn, fut: asyncio.Future) -> None:
         reusable = False
         try:
-            _, keep, _ = await asyncio.wait_for(fut, 120)
+            _, keep, _, _ = await asyncio.wait_for(fut, 120)
             conn.nreq += 1
             reusable = keep and (rpc <= 0 or conn.nreq < rpc)
         except BaseException:  # noqa: BLE001
@@ -365,8 +385,8 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                 out_q.put(("ok", idx, dict(st.ok_dirty)))
                 st.ok_dirty.clear()
 
-    # процесорний час генератора раз на секунду — окремим потоком, щоб вимірювання
-    # не залежало від завантаженості циклу подій
+    # generator CPU time once a second — in a separate thread, so the measurement
+    # does not depend on how busy the event loop is
     cpu_stop = threading.Event()
 
     def cpu_reporter() -> None:
@@ -378,16 +398,16 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
     fl = asyncio.ensure_future(flusher())
     tasks: set[asyncio.Task] = set()
 
-    # Розклад: у сходинці з інтенсивністю R процес idx відправляє в моменти
-    # a + (idx + j·P) / R, де a — початок сходинки.
+    # Schedule: in a step with rate R process idx sends at the moments
+    # a + (idx + j·P) / R, where a is the start of the step.
     #
-    # Моменти відміряє окремий потік через time.sleep, а не asyncio.sleep: на
-    # Windows до Python 3.13 годинник циклу подій (time.monotonic) має роздільність
-    # 15.6 мс, і таймери asyncio спрацьовують до 15 мс раніше або пізніше. Тоді запит
-    # іде раніше запланованого моменту, і затримка «від запланованого моменту»
-    # спотворюється (аж до відʼємних значень). time.sleep з Python 3.11 на Windows
-    # використовує таймер високої роздільності. Потік ніколи не відправляє запит
-    # раніше його моменту; запізнення відправки записується (send_lag).
+    # The moments are timed by a separate thread with time.sleep, not asyncio.sleep: on
+    # Windows before Python 3.13 the event loop clock (time.monotonic) has a resolution
+    # of 15.6 ms, and asyncio timers fire up to 15 ms early or late. The request then
+    # goes out before its scheduled moment, and the latency "from the scheduled moment"
+    # is distorted (even negative values). time.sleep since Python 3.11 on Windows
+    # uses a high-resolution timer. The thread never sends a request
+    # before its moment; the send lag is recorded (send_lag).
     def fire(batch):
         for t_s, req in batch:
             task = asyncio.ensure_future(one(t_s, req))
@@ -405,7 +425,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
                 rate = prof.rate_of_step(k)
                 if a >= ctl["stop_at"].value:
                     break
-                if rate <= 0 or b <= a:          # немає прогріву (профіль з відрізків)
+                if rate <= 0 or b <= a:          # no warm-up (segment profile)
                     k += 1
                     continue
                 interval = nprocs / rate
@@ -430,7 +450,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
 
     threading.Thread(target=scheduler, daemon=True).start()
     await sched_done
-    await asyncio.sleep(0.05)              # дати циклу створити останні задачі
+    await asyncio.sleep(0.05)              # let the loop create the last tasks
 
     if tasks:
         await asyncio.wait(tasks, timeout=timeout + 2)
@@ -445,6 +465,7 @@ async def _worker_main(idx: int, nprocs: int, cfg: dict, ids: list[int], t0_wall
         "lag": {s: v for s, v in st.lag.items()},
         "pod_sec": {s: dict(v) for s, v in st.pod_sec.items()},
         "max_inflight": st.max_inflight, "max_conns_open": pool.open,
+        "codes": dict(st.codes), "created": st.created,
     }))
 
 
@@ -459,7 +480,7 @@ def _worker(idx, nprocs, cfg, ids, t0_wall, stop_at, out_q):
 
 
 # --------------------------------------------------------------------------
-# Батьківський процес: контроль зупинки і підсумки
+# Parent process: stop control and totals
 # --------------------------------------------------------------------------
 def percentile(sorted_vals, p):
     if not sorted_vals:
@@ -472,7 +493,7 @@ def step_summary(prof: Profile, k: int, per_sec: dict, lat_by_sec: dict,
                  lag_by_sec: dict | None = None, settle: float = 5.0,
                  pod_sec: dict | None = None) -> dict:
     a, b = prof.step_bounds(k)
-    # перші settle секунд сходинки — перехідні (ЛР 2: 5 с з 20, ЛР 3: 10 с з 30)
+    # the first settle seconds of a step are transient (Lab 2: 5 s of 20, Lab 3: 10 s of 30)
     secs = [s for s in range(int(a) + int(settle), int(b))]
     ach = [per_sec["ok"].get(s, 0) for s in secs]
     lat = sorted(x for s in secs for x in lat_by_sec.get(s, []))
@@ -496,7 +517,7 @@ def step_summary(prof: Profile, k: int, per_sec: dict, lat_by_sec: dict,
         "p99_ms": round(percentile(lat, 99) * 1000, 2) if lat else None,
         "send_lag_p99_ms": round(percentile(lag, 99) * 1000, 2) if lag else None,
         "ratio": round(mean / rate, 4) if rate else None,
-        # 2xx-відповіді кожного пода за вікно (заголовок X-Pod), запитів/с
+        # 2xx responses of each pod over the window (X-Pod header), requests/s
         "pods_rps": {pod: round(sum((pod_sec or {}).get(s, {}).get(pod, 0) for s in secs)
                                 / len(secs), 2)
                      for pod in sorted({p for s in secs for p in (pod_sec or {}).get(s, {})})}
@@ -510,7 +531,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
     ctx = mp.get_context("spawn")
     out_q = ctx.Queue()
     stop_at = ctx.Value("d", prof.total)
-    t0_wall = time.time() + 1.0 + 0.2 * nprocs     # час на запуск процесів
+    t0_wall = time.time() + 1.0 + 0.2 * nprocs     # time to start the processes
     procs = [ctx.Process(target=_worker, daemon=True,
                          args=(i, nprocs, cfg, ids, t0_wall, stop_at, out_q))
              for i in range(nprocs)]
@@ -538,7 +559,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
         except Exception:  # noqa: BLE001 — queue.Empty
             pass
         now_rel = time.time() - t0_wall
-        k_now = prof.step_of(now_rel - 0.8)             # 0.8 с на доставку лічильників
+        k_now = prof.step_of(now_rel - 0.8)             # 0.8 s for the counters to arrive
         for k in range(0, k_now):
             if prof.segments or k in evaluated or stop_at.value < prof.total:
                 continue
@@ -556,7 +577,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
                 stop_reason = "reached_generator_limit"
             else:
                 continue
-            stop_at.value = b                            # далі нових запитів не планувати
+            stop_at.value = b                            # schedule no new requests after this
             log(f"  stop: {stop_reason} after step {k}")
     for p in procs:
         p.join()
@@ -565,6 +586,8 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
     lat_by_sec: dict[int, list] = defaultdict(list)
     lag_by_sec: dict[int, list] = defaultdict(list)
     pods: dict[str, int] = defaultdict(int)
+    codes: dict[int, int] = defaultdict(int)
+    created: list = []
     pod_sec: dict[int, dict] = defaultdict(lambda: defaultdict(int))
     for f in finals.values():
         for s, d in f.get("pod_sec", {}).items():
@@ -579,6 +602,9 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
             lag_by_sec[int(s)].extend(v)
         for pod, v in f["pods"].items():
             pods[pod] += v
+        for code, v in f.get("codes", {}).items():
+            codes[int(code)] += v
+        created.extend(f.get("created", []))
 
     last_sec = int(min(stop_at.value, prof.total))
     seconds = []
@@ -600,7 +626,7 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
             if lag_by_sec.get(s) else None,
             "pods": dict(pod_sec.get(s, {})),
         })
-    # використання CPU генератором (сума по процесах), ядер, посекундно
+    # generator CPU usage (sum over processes), cores, per second
     gen_cpu = defaultdict(float)
     for smp in cpu_samples.values():
         for (t1, c1), (t2, c2) in zip(smp, smp[1:]):
@@ -622,6 +648,8 @@ def run(cfg: dict, ids: list[int], log=print) -> dict:
         "X_step": best["step"] if best else None,
         "X_target_rps": best["target_rps"] if best else None,
         "steps": steps, "seconds": seconds, "pods": dict(pods),
+        "codes": {str(k): v for k, v in sorted(codes.items())},
+        "created_tasks": sorted(created, key=lambda x: x[1]),
         "generator": {
             "procs": nprocs, "python": platform.python_version(),
             "platform": platform.platform(), "cpu_count": os.cpu_count(),
@@ -681,7 +709,7 @@ def build_argparser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--base-url", default="http://localhost:8080")
-    p.add_argument("--target", choices=["item", "noop"], default="item")
+    p.add_argument("--target", choices=["item", "noop", "task"], default="item")
     p.add_argument("--name", required=True, help="імʼя прогону (файли results/lab2/raw/<name>.*)")
     p.add_argument("--gen-limit", type=float, default=None, help="межа генератора G, rps")
     p.add_argument("--warmup", type=float, default=10.0)

@@ -1,4 +1,4 @@
-# Разова міграція схеми (той самий образ, інша команда).
+# One-off schema migration (same image, different command).
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -13,7 +13,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: migrate
-          image: trials-web:lab3
+          image: trials-web:lab4
           imagePullPolicy: Never
           command: ["python", "-m", "app.migrate"]
           envFrom:

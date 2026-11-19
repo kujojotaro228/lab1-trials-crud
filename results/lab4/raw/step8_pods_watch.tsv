@@ -1,0 +1,37 @@
+host_time	pod	deletionTimestamp	exitCode	reason	finishedAt	lastExitCode	restarts
+2026-11-19 19:47:26	worker-7f87c4cfbc-9b6k8                                 0
+2026-11-19 19:47:26	worker-7f87c4cfbc-ck64t                                 0
+2026-11-19 19:47:26	worker-7f87c4cfbc-whqvq                                 0
+2026-11-19 19:47:26	worker-7f87c4cfbc-zp5nw                                 0
+2026-11-19 19:48:07	worker-7cd7cbf497-2w86q                                 
+2026-11-19 19:48:07	worker-7cd7cbf497-2w86q                                 
+2026-11-19 19:48:07	worker-7cd7cbf497-2w86q                                 0
+2026-11-19 19:48:08	worker-7cd7cbf497-2w86q                                 0
+2026-11-19 19:48:08	worker-7f87c4cfbc-9b6k8   2026-11-19T18:48:38Z                           0
+2026-11-19 19:48:08	worker-7cd7cbf497-dwnxp                                                  
+2026-11-19 19:48:08	worker-7cd7cbf497-dwnxp                                                  
+2026-11-19 19:48:08	worker-7cd7cbf497-dwnxp                                                  0
+2026-11-19 19:48:08	worker-7f87c4cfbc-9b6k8   2026-11-19T18:48:38Z   0     Completed   2026-11-19T18:48:08Z         0
+2026-11-19 19:48:09	worker-7f87c4cfbc-9b6k8   2026-11-19T18:48:08Z   0     Completed   2026-11-19T18:48:08Z         0
+2026-11-19 19:48:09	worker-7f87c4cfbc-9b6k8   2026-11-19T18:48:08Z   0     Completed   2026-11-19T18:48:08Z         0
+2026-11-19 19:48:09	worker-7cd7cbf497-dwnxp                                                                         0
+2026-11-19 19:48:09	worker-7f87c4cfbc-whqvq   2026-11-19T18:48:39Z                                                  0
+2026-11-19 19:48:09	worker-7cd7cbf497-x4z8s                                                                         
+2026-11-19 19:48:09	worker-7cd7cbf497-x4z8s                                                                         
+2026-11-19 19:48:09	worker-7cd7cbf497-x4z8s                                                                         0
+2026-11-19 19:48:10	worker-7f87c4cfbc-whqvq   2026-11-19T18:48:39Z   0     Completed   2026-11-19T18:48:09Z         0
+2026-11-19 19:48:10	worker-7f87c4cfbc-whqvq   2026-11-19T18:48:09Z   0     Completed   2026-11-19T18:48:09Z         0
+2026-11-19 19:48:10	worker-7f87c4cfbc-whqvq   2026-11-19T18:48:09Z   0     Completed   2026-11-19T18:48:09Z         0
+2026-11-19 19:48:11	worker-7cd7cbf497-x4z8s                                                                         0
+2026-11-19 19:48:11	worker-7f87c4cfbc-zp5nw   2026-11-19T18:48:41Z                                                  0
+2026-11-19 19:48:11	worker-7cd7cbf497-drzxw                                                                         
+2026-11-19 19:48:11	worker-7cd7cbf497-drzxw                                                                         
+2026-11-19 19:48:11	worker-7cd7cbf497-drzxw                                                                         0
+2026-11-19 19:48:11	worker-7f87c4cfbc-zp5nw   2026-11-19T18:48:41Z   0     Completed   2026-11-19T18:48:11Z         0
+2026-11-19 19:48:11	worker-7cd7cbf497-drzxw                                                                         0
+2026-11-19 19:48:11	worker-7f87c4cfbc-ck64t   2026-11-19T18:48:41Z                                                  0
+2026-11-19 19:48:12	worker-7f87c4cfbc-ck64t   2026-11-19T18:48:41Z   0     Completed   2026-11-19T18:48:11Z         0
+2026-11-19 19:48:12	worker-7f87c4cfbc-zp5nw   2026-11-19T18:48:11Z   0     Completed   2026-11-19T18:48:11Z         0
+2026-11-19 19:48:12	worker-7f87c4cfbc-zp5nw   2026-11-19T18:48:11Z   0     Completed   2026-11-19T18:48:11Z         0
+2026-11-19 19:48:12	worker-7f87c4cfbc-ck64t   2026-11-19T18:48:11Z   0     Completed   2026-11-19T18:48:11Z         0
+2026-11-19 19:48:12	worker-7f87c4cfbc-ck64t   2026-11-19T18:48:11Z   0     Completed   2026-11-19T18:48:11Z         0

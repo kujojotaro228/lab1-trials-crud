@@ -11,7 +11,7 @@ from fastapi import FastAPI, Path, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, Response
 
-from . import db, metrics
+from . import db, metrics, tasks
 from .config import settings
 from .schemas import (
     ALLOWED_GROUPS,
@@ -25,9 +25,9 @@ logging.basicConfig(level=logging.INFO,
 log = logging.getLogger("app")
 
 RESOURCE = "/trial-participants"
-# імʼя екземпляра: POD_NAME, а якщо змінну не задано — hostname контейнера
+# instance name: POD_NAME, or the container hostname if the variable is not set
 INSTANCE = os.environ.get("POD_NAME") or socket.gethostname()
-MAX_ID = 2 ** 63 - 1                     # межа BIGINT
+MAX_ID = 2 ** 63 - 1                     # BIGINT limit
 MAX_OFFSET = 1_000_000_000
 
 COLUMNS = ("id, participant_code, protocol, randomization_group, enrollment_date, "
@@ -51,7 +51,7 @@ SQL_DELETE = "DELETE FROM trial_participants WHERE id = $1 RETURNING id"
 
 
 # --------------------------------------------------------------------------
-# Допоміжні функції
+# Helpers
 # --------------------------------------------------------------------------
 def row_to_dict(r: asyncpg.Record) -> Dict[str, Any]:
     return {
@@ -94,7 +94,7 @@ def values(p: ParticipantIn) -> tuple:
 
 
 # --------------------------------------------------------------------------
-# Застосунок
+# Application
 # --------------------------------------------------------------------------
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -102,9 +102,14 @@ async def lifespan(_app: FastAPI):
     ready = await db.wait_for_db(settings.db_startup_timeout)
     log.info("instance=%s started, database ready=%s, pool size=%d, cpu.stat=%s",
              INSTANCE, ready, settings.pool_size, metrics.CPU_STAT_PATH)
+    # Lab 4: tasks_queued/tasks_running gauges and returning tasks with an expired lease
+    stop = asyncio.Event()
+    bg = asyncio.create_task(tasks.background_loop(stop))
     yield
-    # Сюди потрапляємо під час коректної зупинки: uvicorn уже перестав приймати
-    # зʼєднання і дочекався запитів в обробці. Лишається закрити пул.
+    stop.set()
+    await bg
+    # We get here during graceful shutdown: uvicorn has already stopped accepting
+    # connections and waited for in-flight requests. Only the pool is left to close.
     await db.close_pool()
     log.info("instance=%s: connection pool closed", INSTANCE)
 
@@ -113,11 +118,11 @@ app = FastAPI(title="Trial participants CRUD", version="1.0.0", lifespan=lifespa
 
 
 class InstanceHeaderMiddleware:
-    """Чиста ASGI-обгортка: додає до кожної відповіді заголовок X-Pod з іменем
-    екземпляра (і X-Instance з тим самим значенням — його читають скрипти ЛР 1).
+    """Plain ASGI wrapper: adds an X-Pod header with the instance name to every
+    response (and X-Instance with the same value — Lab 1 scripts read it).
 
-    Дає змогу генератору навантаження порахувати, скільки відповідей дав
-    кожен екземпляр (підтвердження балансування). Стану не тримає.
+    Lets the load generator count how many responses each instance served
+    (proof of load balancing). Holds no state.
     """
 
     def __init__(self, app):
@@ -137,12 +142,13 @@ class InstanceHeaderMiddleware:
         await self.app(scope, receive, send_wrapper)
 
 
+app.include_router(tasks.router)
 app.add_middleware(InstanceHeaderMiddleware)
-app.add_middleware(metrics.MetricsMiddleware)   # додано останнім — зовнішній шар
+app.add_middleware(metrics.MetricsMiddleware)   # added last — the outermost layer
 
 
 # --------------------------------------------------------------------------
-# Обробники помилок: жодна очікувана помилка не виходить назовні як 500
+# Error handlers: no expected error leaks out as a 500
 # --------------------------------------------------------------------------
 @app.exception_handler(RequestValidationError)
 async def on_request_validation_error(_request: Request, exc: RequestValidationError):
@@ -153,14 +159,14 @@ def _asyncpg_exc(name: str):
     return getattr(asyncpg.exceptions, name, None)
 
 
-# Усе, що означає «база недоступна» → 503
+# Everything that means "database unavailable" → 503
 DB_UNAVAILABLE = tuple(e for e in (
-    OSError,                       # включно з ConnectionRefusedError і TimeoutError
+    OSError,                       # including ConnectionRefusedError and TimeoutError
     asyncio.TimeoutError,
     _asyncpg_exc("PostgresConnectionError"),
     _asyncpg_exc("CannotConnectNowError"),
     _asyncpg_exc("AdminShutdownError"),
-    _asyncpg_exc("InterfaceError"),   # у т.ч. ConnectionDoesNotExistError
+    _asyncpg_exc("InterfaceError"),   # including ConnectionDoesNotExistError
 ) if e is not None)
 
 
@@ -176,16 +182,16 @@ for _exc_cls in DB_UNAVAILABLE:
 
 @app.exception_handler(asyncpg.CheckViolationError)
 async def on_check_violation(_request: Request, exc: asyncpg.CheckViolationError):
-    # Сюди потрапити не повинно: сервіс перевіряє дані раніше за базу.
-    # CHECK у таблиці — другий рубіж; навіть тоді відповідаємо 400, а не 500.
+    # We should never get here: the service validates data before the database does.
+    # The table CHECK is the second line of defence; even then we answer 400, not 500.
     return validation_error([{"field": getattr(exc, "constraint_name", "") or "body",
                               "location": "body",
                               "message": "порушено обмеження бази даних"}])
 
 
 async def on_bad_encoding(_request: Request, _exc: Exception):
-    # Другий рубіж для рядків, які база не може зберегти (наприклад, \x00).
-    # Схема відсіює їх раніше, але навіть тоді клієнт отримує 400, а не 500.
+    # Second line of defence for strings the database cannot store (e.g. \x00).
+    # The schema rejects them earlier, but even then the client gets 400, not 500.
     return validation_error([{"field": "body", "location": "body",
                               "message": "рядок містить символ, який не можна зберегти"}])
 
@@ -197,7 +203,7 @@ for _name in ("CharacterNotInRepertoireError", "UntranslatableCharacterError"):
 
 
 # --------------------------------------------------------------------------
-# Ендпоінти
+# Endpoints
 # --------------------------------------------------------------------------
 @app.post(RESOURCE, status_code=201)
 async def create_participant(body: ParticipantIn):
@@ -284,7 +290,7 @@ async def delete_participant(participant_id: int = Path(ge=1, le=MAX_ID)):
 
 @app.get("/livez")
 async def livez():
-    """Живучість процесу: 200 без звернення до бази."""
+    """Process liveness: 200 without touching the database."""
     return JSONResponse({"status": "alive", "instance": INSTANCE})
 
 
@@ -296,7 +302,7 @@ async def prometheus_metrics():
 
 @app.get("/healthz")
 async def healthz():
-    """Готовність: база відповідає і схема накочена міграцією."""
+    """Readiness: the database responds and the schema has been migrated."""
     try:
         pool = await db.get_pool()
         schema_ok = await asyncio.wait_for(

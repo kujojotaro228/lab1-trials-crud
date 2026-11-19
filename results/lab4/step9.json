@@ -1,0 +1,180 @@
+{
+ "nopoison": {
+  "t_from": 1795114185.662128,
+  "t_gen_end": 1795114487.37379,
+  "t_to": 1795114787.966711,
+  "counts_end": {
+   "queued": 17130,
+   "running": 0,
+   "done": 211,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 17341
+  },
+  "counts_drained": {
+   "queued": 17102,
+   "running": 0,
+   "done": 239,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 17341
+  },
+  "gen_codes": {
+   "202": 17341
+  },
+  "container_exits": {},
+  "restarts": {
+   "worker-7d87b58fb5-gnt8m": 6,
+   "worker-7d87b58fb5-phvcb": 6,
+   "worker-7d87b58fb5-znqfq": 6,
+   "worker-7d87b58fb5-zt7js": 6
+  },
+  "restarts_total": 24,
+  "rate": 57.8,
+  "total": 17341,
+  "statuses": {
+   "done": 239,
+   "queued": 17102
+  },
+  "failed": 0,
+  "multi_result": 0,
+  "attempts_gt1": 24,
+  "attempts_dist": {
+   "0": 17098,
+   "1": 219,
+   "2": 24
+  },
+  "t_scenario": 1795114336.045162,
+  "share_attempts_gt1": 0.0013840032293408685,
+  "share_failed": 0.0,
+  "wait_p99_s": 355.83593487739563,
+  "wait_p50_s": 85.84732913970947,
+  "X_done_per_s": 0.7921470399018751
+ },
+ "poison": {
+  "t_from": 1795114801.290831,
+  "t_gen_end": 1795115103.04092,
+  "t_to": 1795115404.204455,
+  "counts_end": {
+   "queued": 17239,
+   "running": 0,
+   "done": 111,
+   "failed": 1,
+   "cancelled": 0,
+   "total": 17351
+  },
+  "counts_drained": {
+   "queued": 17229,
+   "running": 0,
+   "done": 121,
+   "failed": 1,
+   "cancelled": 0,
+   "total": 17351
+  },
+  "gen_codes": {
+   "202": 17341
+  },
+  "container_exits": {},
+  "restarts": {
+   "worker-7d87b58fb5-24hdd": 6,
+   "worker-7d87b58fb5-mg7wr": 6,
+   "worker-7d87b58fb5-mrvz4": 6,
+   "worker-7d87b58fb5-zxnc5": 6
+  },
+  "restarts_total": 24,
+  "rate": 57.8,
+  "total": 17351,
+  "statuses": {
+   "done": 121,
+   "failed": 1,
+   "queued": 17229
+  },
+  "failed": 1,
+  "multi_result": 0,
+  "attempts_gt1": 22,
+  "attempts_dist": {
+   "0": 17226,
+   "1": 103,
+   "2": 20,
+   "3": 2
+  },
+  "t_scenario": 1795114951.68112,
+  "share_attempts_gt1": 0.0012686696268957962,
+  "share_failed": 5.7666801222536187e-05,
+  "wait_p99_s": 351.83689999580383,
+  "wait_p50_s": 45.67708492279053,
+  "X_done_per_s": 0.4009940823182904,
+  "poison": [
+   {
+    "id": "8622",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8623",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8624",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8625",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8626",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8627",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8628",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8629",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8630",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   },
+   {
+    "id": "8631",
+    "status": "queued",
+    "attempts": "0",
+    "created_to_final_s": null,
+    "worker": ""
+   }
+  ]
+ }
+}

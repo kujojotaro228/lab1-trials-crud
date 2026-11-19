@@ -57,6 +57,20 @@ Web — `http://localhost:8080`, Prometheus — `http://localhost:9090`, Ingress
 
 ---
 
+## ЛР 4: черга задач і пул воркерів
+
+Звіт — [REPORT4.md](REPORT4.md). Стенд ЛР 3 + таблиці `tasks`/`task_results` (міграція
+`002_create_tasks.sql`), ендпоінти задач у web ([app/tasks.py](app/tasks.py)), воркер з окремим
+образом ([worker/](worker/)), Deployment [k8s/worker.yaml](k8s/worker.yaml).
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\k8s\deploy.ps1 -SkipCluster   # образи lab4, міграція, worker
+py loadtest/lab4.py all            # кроки 1–10, докази в results/lab4/<крок>.md
+py loadtest/lab4_analyze.py        # results/lab4/summary.md, fig/*.png
+```
+
+---
+
 ## Етап 1. Проєктування
 
 ### Таблиця `trial_participants`

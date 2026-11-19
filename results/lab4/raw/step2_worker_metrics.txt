@@ -1,0 +1,157 @@
+# HELP python_gc_objects_collected_total Objects collected during gc
+# TYPE python_gc_objects_collected_total counter
+python_gc_objects_collected_total{generation="0"} 357.0
+python_gc_objects_collected_total{generation="1"} 0.0
+python_gc_objects_collected_total{generation="2"} 0.0
+# HELP python_gc_objects_uncollectable_total Uncollectable objects found during GC
+# TYPE python_gc_objects_uncollectable_total counter
+python_gc_objects_uncollectable_total{generation="0"} 0.0
+python_gc_objects_uncollectable_total{generation="1"} 0.0
+python_gc_objects_uncollectable_total{generation="2"} 0.0
+# HELP python_gc_collections_total Number of times this generation was collected
+# TYPE python_gc_collections_total counter
+python_gc_collections_total{generation="0"} 47.0
+python_gc_collections_total{generation="1"} 4.0
+python_gc_collections_total{generation="2"} 0.0
+# HELP python_info Python platform information
+# TYPE python_info gauge
+python_info{implementation="CPython",major="3",minor="12",patchlevel="16",version="3.12.16"} 1.0
+# HELP process_virtual_memory_bytes Virtual memory size in bytes.
+# TYPE process_virtual_memory_bytes gauge
+process_virtual_memory_bytes 4.2909696e+07
+# HELP process_resident_memory_bytes Resident memory size in bytes.
+# TYPE process_resident_memory_bytes gauge
+process_resident_memory_bytes 3.4471936e+07
+# HELP process_start_time_seconds Start time of the process since unix epoch in seconds.
+# TYPE process_start_time_seconds gauge
+process_start_time_seconds 1.79511323945e+09
+# HELP process_cpu_seconds_total Total user and system CPU time spent in seconds.
+# TYPE process_cpu_seconds_total counter
+process_cpu_seconds_total 1.8099999999999998
+# HELP process_open_fds Number of open file descriptors.
+# TYPE process_open_fds gauge
+process_open_fds 12.0
+# HELP process_max_fds Maximum number of open file descriptors.
+# TYPE process_max_fds gauge
+process_max_fds 1.048576e+06
+# HELP worker_tasks_total Завершені задачі за результатом
+# TYPE worker_tasks_total counter
+worker_tasks_total{result="done"} 20.0
+worker_tasks_total{result="failed"} 0.0
+worker_tasks_total{result="lost"} 0.0
+# HELP worker_tasks_created Завершені задачі за результатом
+# TYPE worker_tasks_created gauge
+worker_tasks_created{result="done"} 1.7951132412432034e+09
+worker_tasks_created{result="failed"} 1.795113241243213e+09
+worker_tasks_created{result="lost"} 1.795113241243218e+09
+# HELP worker_claims_total Спроби захоплення за результатом
+# TYPE worker_claims_total counter
+worker_claims_total{result="task"} 20.0
+worker_claims_total{result="empty"} 828.0
+# HELP worker_claims_created Спроби захоплення за результатом
+# TYPE worker_claims_created gauge
+worker_claims_created{result="task"} 1.7951132412432225e+09
+worker_claims_created{result="empty"} 1.7951132412432263e+09
+# HELP worker_task_duration_seconds Тривалість кроку задачі, с
+# TYPE worker_task_duration_seconds histogram
+worker_task_duration_seconds_bucket{le="0.0005",step="claim"} 0.0
+worker_task_duration_seconds_bucket{le="0.001",step="claim"} 376.0
+worker_task_duration_seconds_bucket{le="0.0025",step="claim"} 844.0
+worker_task_duration_seconds_bucket{le="0.005",step="claim"} 845.0
+worker_task_duration_seconds_bucket{le="0.01",step="claim"} 846.0
+worker_task_duration_seconds_bucket{le="0.025",step="claim"} 847.0
+worker_task_duration_seconds_bucket{le="0.05",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="0.1",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="0.25",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="0.5",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="1.0",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="2.5",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="5.0",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="10.0",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="30.0",step="claim"} 848.0
+worker_task_duration_seconds_bucket{le="+Inf",step="claim"} 848.0
+worker_task_duration_seconds_count{step="claim"} 848.0
+worker_task_duration_seconds_sum{step="claim"} 1.0007751040002404
+worker_task_duration_seconds_bucket{le="0.0005",step="fetch"} 0.0
+worker_task_duration_seconds_bucket{le="0.001",step="fetch"} 0.0
+worker_task_duration_seconds_bucket{le="0.0025",step="fetch"} 19.0
+worker_task_duration_seconds_bucket{le="0.005",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.01",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.025",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.05",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.1",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.25",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="0.5",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="1.0",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="2.5",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="5.0",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="10.0",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="30.0",step="fetch"} 20.0
+worker_task_duration_seconds_bucket{le="+Inf",step="fetch"} 20.0
+worker_task_duration_seconds_count{step="fetch"} 20.0
+worker_task_duration_seconds_sum{step="fetch"} 0.032901265999925045
+worker_task_duration_seconds_bucket{le="0.0005",step="process"} 0.0
+worker_task_duration_seconds_bucket{le="0.001",step="process"} 0.0
+worker_task_duration_seconds_bucket{le="0.0025",step="process"} 0.0
+worker_task_duration_seconds_bucket{le="0.005",step="process"} 0.0
+worker_task_duration_seconds_bucket{le="0.01",step="process"} 0.0
+worker_task_duration_seconds_bucket{le="0.025",step="process"} 7.0
+worker_task_duration_seconds_bucket{le="0.05",step="process"} 18.0
+worker_task_duration_seconds_bucket{le="0.1",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="0.25",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="0.5",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="1.0",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="2.5",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="5.0",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="10.0",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="30.0",step="process"} 20.0
+worker_task_duration_seconds_bucket{le="+Inf",step="process"} 20.0
+worker_task_duration_seconds_count{step="process"} 20.0
+worker_task_duration_seconds_sum{step="process"} 0.6707605439999611
+worker_task_duration_seconds_bucket{le="0.0005",step="store"} 0.0
+worker_task_duration_seconds_bucket{le="0.001",step="store"} 0.0
+worker_task_duration_seconds_bucket{le="0.0025",step="store"} 0.0
+worker_task_duration_seconds_bucket{le="0.005",step="store"} 16.0
+worker_task_duration_seconds_bucket{le="0.01",step="store"} 16.0
+worker_task_duration_seconds_bucket{le="0.025",step="store"} 18.0
+worker_task_duration_seconds_bucket{le="0.05",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="0.1",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="0.25",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="0.5",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="1.0",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="2.5",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="5.0",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="10.0",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="30.0",step="store"} 20.0
+worker_task_duration_seconds_bucket{le="+Inf",step="store"} 20.0
+worker_task_duration_seconds_count{step="store"} 20.0
+worker_task_duration_seconds_sum{step="store"} 0.15509578799992596
+# HELP worker_task_duration_seconds_created Тривалість кроку задачі, с
+# TYPE worker_task_duration_seconds_created gauge
+worker_task_duration_seconds_created{step="claim"} 1.795113241243237e+09
+worker_task_duration_seconds_created{step="fetch"} 1.7951132412432733e+09
+worker_task_duration_seconds_created{step="process"} 1.795113241243318e+09
+worker_task_duration_seconds_created{step="store"} 1.7951132412433395e+09
+# HELP worker_tasks_in_flight Задачі в обробці цим воркером
+# TYPE worker_tasks_in_flight gauge
+worker_tasks_in_flight 0.0
+# HELP worker_tasks_returned_total Задачі, повернуті в чергу під час коректної зупинки
+# TYPE worker_tasks_returned_total counter
+worker_tasks_returned_total 0.0
+# HELP worker_tasks_returned_created Задачі, повернуті в чергу під час коректної зупинки
+# TYPE worker_tasks_returned_created gauge
+worker_tasks_returned_created 1.7951132412431476e+09
+# HELP worker_tasks_cancelled_total Задачі, зупинені через скасування (Д6)
+# TYPE worker_tasks_cancelled_total counter
+worker_tasks_cancelled_total 0.0
+# HELP worker_tasks_cancelled_created Задачі, зупинені через скасування (Д6)
+# TYPE worker_tasks_cancelled_created gauge
+worker_tasks_cancelled_created 1.7951132412431614e+09
+# HELP worker_zero_rows_total Команди з умовою за токеном, що оновили нуль рядків
+# TYPE worker_zero_rows_total counter
+# HELP worker_duplicate_result_total Спроби записати другий результат (лише STORE_MODE=plain з первинним ключем)
+# TYPE worker_duplicate_result_total counter
+worker_duplicate_result_total 0.0
+# HELP worker_duplicate_result_created Спроби записати другий результат (лише STORE_MODE=plain з первинним ключем)
+# TYPE worker_duplicate_result_created gauge
+worker_duplicate_result_created 1.795113241243183e+09

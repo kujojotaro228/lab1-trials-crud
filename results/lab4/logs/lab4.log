@@ -1,0 +1,369 @@
+
+#### 2026-11-19 19:33:42 loadtest/lab4.py all
+== setup
+   `kubectl scale deployment/web --replicas=2` — воркери звертаються до web за записами
+   -> results\lab4\setup.md
+== api
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   для порівняння — стан таблиці tasks у той самий момент: {'queued': 5, 'running': 0, 'done': 0, 'failed': 0, 'cancelled': 0, 'total': 5} (вимірювачі оновлюються кожні 5 с, Prometheus збирає кожні 5 с)
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   -> results\lab4\step1_api.md
+== step2
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=1`
+   готово воркерів: 1 (worker-7f87c4cfbc-7x4vx), очікування 1.2 с
+   створено 20 задач (20 запитів POST /trial-participants/{id}/tasks)
+   ... {'queued': 20, 'running': 0, 'done': 0, 'failed': 0, 'cancelled': 0, 'total': 20}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 20, 'failed': 0, 'cancelled': 0, 'total': 20} (очікування 1.6 с)
+   t_io і t_cpu взято з гістограми воркера worker_task_duration_seconds (sum/count з /metrics пода)
+   -> results\lab4\step2.md
+== step3
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   первинний ключ task_results тимчасово замінено звичайним індексом ix_task_results_task_id (крок 3)
+   --- T_poll = 10 мс ---
+   `kubectl set env deployment/worker CLAIM_MODE=naive STORE_MODE=plain LEASE_SECONDS=0` і rollout status
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-685f9c6d57-95fnm, worker-685f9c6d57-c9qhh, worker-685f9c6d57-trrdr, worker-685f9c6d57-vm9zf), очікування 1.2 с
+   генератор step3_poll10: створено 300 задач, коди {'202': 300}
+   генератор: 300 POST за 3 с (100/с), коди {'202': 300}
+   ... {'queued': 33, 'running': 2, 'done': 265, 'failed': 0, 'cancelled': 0, 'total': 300}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 300, 'failed': 0, 'cancelled': 0, 'total': 300} (очікування 0.9 с)
+   T_poll = 10 мс: n = 300, рядків у task_results = 335, дублів за таблицею = 33, за журналами (done > 1 разу) = 33, разом n_dup = 33, **D = 0.1100**; приклади задач: [1, 20, 42, 54, 55, 65, 74, 78, 80, 107]
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   --- T_poll = 1 мс ---
+   `kubectl set env deployment/worker POLL_MS=1` і rollout status
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-5fc4d5999-2kljr, worker-5fc4d5999-554jd, worker-5fc4d5999-c57s9, worker-5fc4d5999-nhzsh), очікування 1.2 с
+   генератор step3_poll1: створено 300 задач, коди {'202': 300}
+   генератор: 300 POST за 3 с (100/с), коди {'202': 300}
+   ... {'queued': 51, 'running': 3, 'done': 246, 'failed': 0, 'cancelled': 0, 'total': 300}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 300, 'failed': 0, 'cancelled': 0, 'total': 300} (очікування 0.9 с)
+   T_poll = 1 мс: n = 300, рядків у task_results = 344, дублів за таблицею = 41, за журналами (done > 1 разу) = 41, разом n_dup = 41, **D = 0.1367**; приклади задач: [1, 2, 9, 14, 25, 33, 35, 44, 49, 51]
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   -> results\lab4\step3.md
+== step4
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   первинний ключ task_results(task_id) повернуто (таблиці очищено)
+   --- CLAIM_MODE = skip_locked, T_poll = 1 мс ---
+   `kubectl set env deployment/worker CLAIM_MODE=skip_locked` і rollout status
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-65bd9685d-c58kj, worker-65bd9685d-g75d7, worker-65bd9685d-gq4pp, worker-65bd9685d-mhc6l), очікування 2.3 с
+   генератор step4_skip_locked: створено 300 задач, коди {'202': 300}
+   генератор: 300 POST за 3 с (100/с), коди {'202': 300}
+   ... {'queued': 17, 'running': 4, 'done': 279, 'failed': 0, 'cancelled': 0, 'total': 300}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 300, 'failed': 0, 'cancelled': 0, 'total': 300} (очікування 0.9 с)
+   skip_locked: з /metrics подів напряму (різниця знімків до і після серії): порожніх захоплень 5930, захоплень задачі 300, p99 захоплення за гістограмою 2.48 мс
+   skip_locked: D = 0.0000 (таблиця 0, журнали 0), помилок дубля ключа 0; p99 захоплення (гістограма) = 0.002413617034267181; порожніх захоплень = 24170.03395310234; макс. рядків Lock = 0 за 8 знімків
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   --- CLAIM_MODE = for_update, T_poll = 1 мс ---
+   `kubectl set env deployment/worker CLAIM_MODE=for_update` і rollout status
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-5c7c5d49bc-4p5wl, worker-5c7c5d49bc-c5t2t, worker-5c7c5d49bc-jj52c, worker-5c7c5d49bc-wmk2d), очікування 2.3 с
+   генератор step4_for_update: створено 300 задач, коди {'202': 300}
+   генератор: 300 POST за 3 с (100/с), коди {'202': 300}
+   ... {'queued': 12, 'running': 4, 'done': 284, 'failed': 0, 'cancelled': 0, 'total': 300}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 300, 'failed': 0, 'cancelled': 0, 'total': 300} (очікування 0.9 с)
+   for_update: з /metrics подів напряму (різниця знімків до і після серії): порожніх захоплень 6189, захоплень задачі 300, p99 захоплення за гістограмою 2.47 мс
+   for_update: D = 0.0000 (таблиця 0, журнали 0), помилок дубля ключа 0; p99 захоплення (гістограма) = 0.002404137083560894; порожніх захоплень = 24510.6; макс. рядків Lock = 0 за 8 знімків
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   p99 захоплення і лічильники — гістограма worker_task_duration_seconds{step="claim"} і лічильник worker_claims_total воркерів: через Prometheus (increase за вікно серії) і різницею знімків /metrics подів від старту генератора до порожньої черги
+   `kubectl set env deployment/worker CLAIM_MODE=skip_locked STORE_MODE=idempotent LEASE_SECONDS=15 POLL_MS=10` і rollout status
+   для наступних кроків повернуто SKIP LOCKED, T_poll = 10 мс, lease 15 с, ON CONFLICT
+   -> results\lab4\step4.md
+== step5
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=2`
+   готово воркерів: 2 (worker-7f87c4cfbc-smtwz, worker-7f87c4cfbc-whk8h), очікування 2.3 с
+   демонстрація: додано 1000 задач (INSERT … generate_series), щоб воркери були зайняті
+   `kubectl exec worker-7f87c4cfbc-smtwz -- sh -c 'kill -STOP 1'`
+   за 3 с після `kill -STOP 1` воркер worker-7f87c4cfbc-smtwz записав ще 80 результатів: сигнал STOP до PID 1 свого простору імен PID ядро не доставляє (init захищений від сигналів зсередини простору імен), тому процес не зупинився. Далі зупиняємо сам процес воркера за PID з /tmp/worker.pid — це той самий ефект «завислого» воркера, який мала дати команда із завдання
+   ... {'queued': 765, 'running': 2, 'done': 233, 'failed': 0, 'cancelled': 0, 'total': 1000}
+   ... {'queued': 91, 'running': 1, 'done': 908, 'failed': 0, 'cancelled': 0, 'total': 1000}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 1000, 'failed': 0, 'cancelled': 0, 'total': 1000} (очікування 18.0 с)
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   створено 100 задач (один INSERT, щоб на момент зупинки черга ще не спорожніла)
+   `kubectl exec worker-7f87c4cfbc-smtwz -- sh -c 'kill -STOP $(cat /tmp/worker.pid)'` о 2026-11-19T18:36:50.036+00:00 (годинник бази): у worker-7f87c4cfbc-smtwz в обробці задача 19, attempts = 1, token = 1, lease_until = 2026-11-19T18:37:04.840+00:00
+   `kubectl exec worker-7f87c4cfbc-smtwz -- sh -c 'kill -CONT $(cat /tmp/worker.pid)'` о 2026-11-19T18:37:20.927+00:00 (через 30.9 с = 2·L); на цей момент задача 19: status = done, attempts = 2, token = 2, worker_id = worker-7f87c4cfbc-whk8h
+   черга порожня: {'queued': 0, 'running': 0, 'done': 100, 'failed': 0, 'cancelled': 0, 'total': 100} (очікування 0.2 с)
+   -> results\lab4\step5.md
+== step6
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   --- W = 1 ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 0.1 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   (а) при 0 воркерах додано 400 задач; queued = 400
+   `kubectl scale deployment/worker --replicas=1`
+   готово воркерів: 1 (worker-7f87c4cfbc-lj779), очікування 2.3 с
+   ... {'queued': 381, 'running': 1, 'done': 18, 'failed': 0, 'cancelled': 0, 'total': 400}
+   ... {'queued': 38, 'running': 0, 'done': 362, 'failed': 0, 'cancelled': 0, 'total': 400}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 400, 'failed': 0, 'cancelled': 0, 'total': 400} (очікування 17.3 с)
+   (а) 400 задач спорожнено за 17.42 с: X = 400 / 17.42 = 22.96 задач/с; повних секунд 17 — вікна 30 с до спорожнення при 400 задачах немає, тому основне вимірювання (б) — з більшою чергою
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   при 0 воркерах додано 1000 задач одним INSERT; у черзі queued = 1000 (потрібно ≥ 400; узято max(400, ≈45 с роботи пулу за оцінкою з кроку 2), щоб вікно 30 с до спорожнення черги лежало в сталому режимі, а не на розгоні)
+   `kubectl scale deployment/worker --replicas=1`
+   готово воркерів: 1 (worker-7f87c4cfbc-dgmcj), очікування 1.2 с
+   ... {'queued': 1000, 'running': 0, 'done': 0, 'failed': 0, 'cancelled': 0, 'total': 1000}
+   ... {'queued': 667, 'running': 1, 'done': 332, 'failed': 0, 'cancelled': 0, 'total': 1000}
+   ... {'queued': 312, 'running': 1, 'done': 687, 'failed': 0, 'cancelled': 0, 'total': 1000}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 1000, 'failed': 0, 'cancelled': 0, 'total': 1000} (очікування 45.3 с)
+   W = 1: X = 22.53 ± 0.57 задач/с (вікно 30 с до спорожнення), p99 захоплення 0.023462499999999404, транзакцій/с 148.2518601488119, CPU db-0 0.06131854456918695, CPU воркера 0.5005268663388466
+   --- W = 2 ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   (а) при 0 воркерах додано 400 задач; queued = 400
+   `kubectl scale deployment/worker --replicas=2`
+   готово воркерів: 2 (worker-7f87c4cfbc-kmm95, worker-7f87c4cfbc-tdc6h), очікування 1.2 с
+   ... {'queued': 400, 'running': 0, 'done': 0, 'failed': 0, 'cancelled': 0, 'total': 400}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 400, 'failed': 0, 'cancelled': 0, 'total': 400} (очікування 9.8 с)
+   (а) 400 задач спорожнено за 8.83 с: X = 400 / 8.83 = 45.29 задач/с; повних секунд 8 — вікна 30 с до спорожнення при 400 задачах немає, тому основне вимірювання (б) — з більшою чергою
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   при 0 воркерах додано 2000 задач одним INSERT; у черзі queued = 2000 (потрібно ≥ 400; узято max(400, ≈45 с роботи пулу за оцінкою з кроку 2), щоб вікно 30 с до спорожнення черги лежало в сталому режимі, а не на розгоні)
+   `kubectl scale deployment/worker --replicas=2`
+   готово воркерів: 2 (worker-7f87c4cfbc-8gqhj, worker-7f87c4cfbc-95jhv), очікування 2.3 с
+   ... {'queued': 1963, 'running': 2, 'done': 35, 'failed': 0, 'cancelled': 0, 'total': 2000}
+   ... {'queued': 1275, 'running': 2, 'done': 723, 'failed': 0, 'cancelled': 0, 'total': 2000}
+   ... {'queued': 599, 'running': 2, 'done': 1399, 'failed': 0, 'cancelled': 0, 'total': 2000}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 2000, 'failed': 0, 'cancelled': 0, 'total': 2000} (очікування 44.2 с)
+   W = 2: X = 44.80 ± 0.71 задач/с (вікно 30 с до спорожнення), p99 захоплення 0.019108715775513135, транзакцій/с 282.52, CPU db-0 0.09155616076586617, CPU воркера 0.500524764806306
+   --- W = 4 ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   (а) при 0 воркерах додано 400 задач; queued = 400
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-2spdg, worker-7f87c4cfbc-nfb92, worker-7f87c4cfbc-sbx99, worker-7f87c4cfbc-vddmm), очікування 2.3 с
+   ... {'queued': 341, 'running': 4, 'done': 55, 'failed': 0, 'cancelled': 0, 'total': 400}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 400, 'failed': 0, 'cancelled': 0, 'total': 400} (очікування 4.4 с)
+   (а) 400 задач спорожнено за 4.59 с: X = 400 / 4.59 = 87.22 задач/с; повних секунд 4 — вікна 30 с до спорожнення при 400 задачах немає, тому основне вимірювання (б) — з більшою чергою
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   при 0 воркерах додано 4000 задач одним INSERT; у черзі queued = 4000 (потрібно ≥ 400; узято max(400, ≈45 с роботи пулу за оцінкою з кроку 2), щоб вікно 30 с до спорожнення черги лежало в сталому режимі, а не на розгоні)
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-fb9gr, worker-7f87c4cfbc-kdlxp, worker-7f87c4cfbc-pdfht, worker-7f87c4cfbc-v9n78), очікування 1.2 с
+   ... {'queued': 4000, 'running': 0, 'done': 0, 'failed': 0, 'cancelled': 0, 'total': 4000}
+   ... {'queued': 2746, 'running': 4, 'done': 1250, 'failed': 0, 'cancelled': 0, 'total': 4000}
+   ... {'queued': 1461, 'running': 4, 'done': 2535, 'failed': 0, 'cancelled': 0, 'total': 4000}
+   ... {'queued': 195, 'running': 4, 'done': 3801, 'failed': 0, 'cancelled': 0, 'total': 4000}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 4000, 'failed': 0, 'cancelled': 0, 'total': 4000} (очікування 49.2 с)
+   W = 4: X = 82.60 ± 2.47 задач/с (вікно 30 с до спорожнення), p99 захоплення 0.025795836366328116, транзакцій/с 510.72085766861346, CPU db-0 0.1717684788430637, CPU воркера 0.46548600917766453
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-fb9gr, worker-7f87c4cfbc-kdlxp, worker-7f87c4cfbc-pdfht, worker-7f87c4cfbc-v9n78), очікування 0.1 с
+   -> results\lab4\step6.md
+== step7
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-4cnlz, worker-7f87c4cfbc-96788, worker-7f87c4cfbc-tgc4m, worker-7f87c4cfbc-zzk4r), очікування 2.3 с
+   генератор step7_low: створено 10404 задач, коди {'202': 10404}
+   step7_low: 57.8 задач/с протягом 180 с; генератор: 10404 відповідей, коди {'202': 10404}; кінець о 2026-11-19T18:44:24.410+00:00
+   на кінець генерації: {'queued': 0, 'running': 0, 'done': 10404, 'failed': 0, 'cancelled': 0, 'total': 10404}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 10404, 'failed': 0, 'cancelled': 0, 'total': 10404} (очікування 0.2 с)
+   вікно останніх 120 с: λ = 57.792 задач/с, W_q = 4.40 мс, λ·W_q = 0.2542, L_q (середнє tasks_queued) = 0.14583333333333331, розбіжність 42.640624998778975
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-49d9g, worker-7f87c4cfbc-wg2qz, worker-7f87c4cfbc-xl5v4, worker-7f87c4cfbc-zx5jg), очікування 1.2 с
+   генератор step7_high: створено 12888 задач, коди {'202': 12888}
+   step7_high: 107.4 задач/с протягом 120 с; генератор: 12888 відповідей, коди {'202': 12888}; кінець о 2026-11-19T18:46:38.732+00:00
+   на кінець генерації: {'queued': 2879, 'running': 4, 'done': 10005, 'failed': 0, 'cancelled': 0, 'total': 12888}
+   ... {'queued': 2864, 'running': 4, 'done': 10020, 'failed': 0, 'cancelled': 0, 'total': 12888}
+   ... {'queued': 1584, 'running': 4, 'done': 11300, 'failed': 0, 'cancelled': 0, 'total': 12888}
+   ... {'queued': 305, 'running': 4, 'done': 12579, 'failed': 0, 'cancelled': 0, 'total': 12888}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 12888, 'failed': 0, 'cancelled': 0, 'total': 12888} (очікування 35.1 с)
+   1.3·X(R): у черзі на кінець генерації 2879; W_q перших 100 = 0.114 с, останніх 100 = 34.960 с
+   -> results\lab4\step7.md
+== step8
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7f87c4cfbc-9b6k8, worker-7f87c4cfbc-ck64t, worker-7f87c4cfbc-whqvq, worker-7f87c4cfbc-zp5nw), очікування 1.2 с
+   `kubectl rollout restart deployment/worker` о 2026-11-19T18:48:06.983+00:00 (40-ва секунда прогону)
+   rollout завершено о 2026-11-19T18:48:13.639+00:00: ['worker-7cd7cbf497-2w86q', 'worker-7cd7cbf497-drzxw', 'worker-7cd7cbf497-dwnxp', 'worker-7cd7cbf497-x4z8s']
+   генератор step8: створено 6936 задач, коди {'202': 6936}
+   step8: 57.8 задач/с протягом 120 с; генератор: 6936 відповідей, коди {'202': 6936}; кінець о 2026-11-19T18:49:28.205+00:00
+   на кінець генерації: {'queued': 0, 'running': 0, 'done': 6936, 'failed': 0, 'cancelled': 0, 'total': 6936}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 6936, 'failed': 0, 'cancelled': 0, 'total': 6936} (очікування 0.2 с)
+   -> results\lab4\step8.md
+== step9
+   --- прогін nopoison: FAIL_RATE = 0.15, 57.8 задач/с, 300 с ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 2.3 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl set env deployment/worker FAIL_RATE=0.15` і rollout status
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7d87b58fb5-gnt8m, worker-7d87b58fb5-phvcb, worker-7d87b58fb5-znqfq, worker-7d87b58fb5-zt7js), очікування 2.3 с
+   воркери стартували з 0 подів, тому стовпчик RESTARTS нових подів починається з нуля
+   150-та секунда (2026-11-19T18:52:16.045+00:00): у цьому прогоні отруєних задач немає
+   генератор step9_nopoison: створено 17341 задач, коди {'202': 17341}
+   step9_nopoison: 57.8 задач/с протягом 300 с; генератор: 17341 відповідей, коди {'202': 17341}; кінець о 2026-11-19T18:54:47.373+00:00
+   на кінець генерації: {'queued': 17130, 'running': 0, 'done': 211, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   після генерації чекаємо до 300 с, поки воркери дообслуговують чергу
+   ... {'queued': 17130, 'running': 0, 'done': 211, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17130, 'running': 0, 'done': 211, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17130, 'running': 0, 'done': 211, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17130, 'running': 0, 'done': 211, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17098, 'running': 4, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   ... {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   НЕ дочекались порожньої черги за 300 с: {'queued': 17102, 'running': 0, 'done': 239, 'failed': 0, 'cancelled': 0, 'total': 17341}
+   завершення контейнерів воркера за прогін (kubectl get pods -w): коди виходу {}
+   --- прогін poison: FAIL_RATE = 0.15, 57.8 задач/с, 300 с ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0.15, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7d87b58fb5-24hdd, worker-7d87b58fb5-mg7wr, worker-7d87b58fb5-mrvz4, worker-7d87b58fb5-zxnc5), очікування 2.3 с
+   воркери стартували з 0 подів, тому стовпчик RESTARTS нових подів починається з нуля
+   Ф3: о 2026-11-19T19:02:31.681+00:00 (150-та секунда) створено 10 задач з seed = 0 (INSERT у tasks; через API seed генерує сервіс, і 0 він не видає)
+   генератор step9_poison: створено 17341 задач, коди {'202': 17341}
+   step9_poison: 57.8 задач/с протягом 300 с; генератор: 17341 відповідей, коди {'202': 17341}; кінець о 2026-11-19T19:05:03.040+00:00
+   на кінець генерації: {'queued': 17239, 'running': 0, 'done': 111, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   після генерації чекаємо до 300 с, поки воркери дообслуговують чергу
+   ... {'queued': 17239, 'running': 0, 'done': 111, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17239, 'running': 0, 'done': 111, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17239, 'running': 0, 'done': 111, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17238, 'running': 1, 'done': 111, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17226, 'running': 3, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   ... {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   НЕ дочекались порожньої черги за 300 с: {'queued': 17229, 'running': 0, 'done': 121, 'failed': 1, 'cancelled': 0, 'total': 17351}
+   завершення контейнерів воркера за прогін (kubectl get pods -w): коди виходу {}
+   `kubectl set env deployment/worker FAIL_RATE=0` і rollout status
+   FAIL_RATE повернуто в 0
+   -> results\lab4\step9.md
+== d6
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 2.3 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl set env deployment/worker PROCESS_PASSES=100` і rollout status
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-684c865f9c-9bj5w, worker-684c865f9c-fqt4v, worker-684c865f9c-rk5fs, worker-684c865f9c-svjd6), очікування 2.3 с
+   PROCESS_PASSES = 100: задача виконує обробку зрізу 100 разів, між проходами воркер перевіряє прапорець cancel_requested
+   створено 40 задач
+   DELETE для 20 задач у running (202) і 5 у queued (200); коди відповідей {202: 20, 200: 5}
+   ... {'queued': 11, 'running': 4, 'done': 0, 'failed': 0, 'cancelled': 25, 'total': 40}
+   ... {'queued': 0, 'running': 3, 'done': 12, 'failed': 0, 'cancelled': 25, 'total': 40}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 15, 'failed': 0, 'cancelled': 25, 'total': 40} (очікування 16.8 с)
+   час від запиту скасування до зупинки обробки (cancel_requested_at -> finished_at, годинник бази): p50 = 0.024885177612304688, p99 = 0.07206082344055176 с; статуси скасованих {'cancelled': 25}, результатів у них 0
+   `kubectl set env deployment/worker PROCESS_PASSES=1` і rollout status
+   -> results\lab4\d6.md
+
+#### 2026-11-19 20:26:34 loadtest/lab4.py step9b
+
+#### 2026-11-19 20:28:37 loadtest/lab4.py step9b
+== step9b
+   основний прогін кроку 9 збережено без змін (step9.md); цей прогін — додатковий, бо в основному пул зупинився в CrashLoopBackOff і отруєні задачі не дійшли до обробки
+   --- прогін nopoison: FAIL_RATE = 0.15, R = 4, 12 задач кожні 5 с протягом 50 с ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 2.3 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   `kubectl set env deployment/worker FAIL_RATE=0.15` і rollout status
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7d87b58fb5-5n75b, worker-7d87b58fb5-76bw4, worker-7d87b58fb5-gd977, worker-7d87b58fb5-wqfv7), очікування 2.3 с
+   додано 120 задач (12 кожні 5 с)
+   ... {'queued': 77, 'running': 3, 'done': 40, 'failed': 0, 'cancelled': 0, 'total': 120}
+   ... {'queued': 37, 'running': 4, 'done': 79, 'failed': 0, 'cancelled': 0, 'total': 120}
+   ... {'queued': 17, 'running': 1, 'done': 102, 'failed': 0, 'cancelled': 0, 'total': 120}
+   ... {'queued': 14, 'running': 1, 'done': 105, 'failed': 0, 'cancelled': 0, 'total': 120}
+   ... {'queued': 0, 'running': 1, 'done': 119, 'failed': 0, 'cancelled': 0, 'total': 120}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 120, 'failed': 0, 'cancelled': 0, 'total': 120} (очікування 71.4 с)
+   RESTARTS: {'worker-7d87b58fb5-5n75b': 4, 'worker-7d87b58fb5-76bw4': 4, 'worker-7d87b58fb5-gd977': 4, 'worker-7d87b58fb5-wqfv7': 4} (сума 16); завершення контейнерів за kubectl get pods -w: коди {'1': 18}
+   --- прогін poison: FAIL_RATE = 0.15, R = 4, 12 задач кожні 5 с протягом 50 с ---
+   `kubectl scale deployment/worker --replicas=0`
+   готово воркерів: 0 (—), очікування 1.2 с
+   `TRUNCATE task_results, tasks RESTART IDENTITY` — таблиці черги порожні
+   змінні воркера вже: CLAIM_MODE=skip_locked, STORE_MODE=idempotent, LEASE_SECONDS=15, POLL_MS=10, FAIL_RATE=0.15, PROCESS_PASSES=1
+   `kubectl scale deployment/worker --replicas=4`
+   готово воркерів: 4 (worker-7d87b58fb5-4j85r, worker-7d87b58fb5-cvt5g, worker-7d87b58fb5-ftqmx, worker-7d87b58fb5-wxsbq), очікування 1.2 с
+   Ф3: о 2026-11-19T19:31:18.765+00:00 (25-та секунда) створено 10 задач з seed = 0
+   додано 120 задач (12 кожні 5 с) + 10 отруєних
+   ... {'queued': 49, 'running': 3, 'done': 68, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 36, 'running': 3, 'done': 81, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 24, 'running': 2, 'done': 94, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 26, 'running': 0, 'done': 94, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 11, 'running': 2, 'done': 107, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 6, 'running': 2, 'done': 112, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 8, 'running': 0, 'done': 112, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 8, 'running': 0, 'done': 112, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 8, 'running': 0, 'done': 112, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 8, 'running': 0, 'done': 112, 'failed': 10, 'cancelled': 0, 'total': 130}
+   ... {'queued': 0, 'running': 1, 'done': 119, 'failed': 10, 'cancelled': 0, 'total': 130}
+   черга порожня: {'queued': 0, 'running': 0, 'done': 120, 'failed': 10, 'cancelled': 0, 'total': 130} (очікування 161.4 с)
+   RESTARTS: {'worker-7d87b58fb5-4j85r': 5, 'worker-7d87b58fb5-cvt5g': 5, 'worker-7d87b58fb5-ftqmx': 5, 'worker-7d87b58fb5-wxsbq': 5} (сума 20); завершення контейнерів за kubectl get pods -w: коди {'1': 21}
+   `kubectl set env deployment/worker FAIL_RATE=0` і rollout status
+   FAIL_RATE повернуто в 0
+   -> results\lab4\step9b.md

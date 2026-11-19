@@ -1,0 +1,88 @@
+{
+ "10": {
+  "n": 300,
+  "results_rows": 335,
+  "n_dup": 33,
+  "D": 0.11,
+  "n_dup_db": 33,
+  "D_db": 0.11,
+  "n_dup_log": 33,
+  "D_log": 0.11,
+  "dup_examples": [
+   1,
+   20,
+   42,
+   54,
+   55,
+   65,
+   74,
+   78,
+   80,
+   107
+  ],
+  "only_db": 0,
+  "only_log": 0,
+  "duplicate_result_errors": 0,
+  "done_log_lines": 335,
+  "t_from": 1795113268.0677,
+  "t_to": 1795113273.756471,
+  "pods": [
+   "worker-685f9c6d57-95fnm",
+   "worker-685f9c6d57-c9qhh",
+   "worker-685f9c6d57-trrdr",
+   "worker-685f9c6d57-vm9zf"
+  ],
+  "counts": {
+   "queued": 0,
+   "running": 0,
+   "done": 300,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 300
+  },
+  "direct": null
+ },
+ "1": {
+  "n": 300,
+  "results_rows": 344,
+  "n_dup": 41,
+  "D": 0.13666666666666666,
+  "n_dup_db": 41,
+  "D_db": 0.13666666666666666,
+  "n_dup_log": 41,
+  "D_log": 0.13666666666666666,
+  "dup_examples": [
+   1,
+   2,
+   9,
+   14,
+   25,
+   33,
+   35,
+   44,
+   49,
+   51
+  ],
+  "only_db": 0,
+  "only_log": 0,
+  "duplicate_result_errors": 0,
+  "done_log_lines": 344,
+  "t_from": 1795113298.526705,
+  "t_to": 1795113304.107714,
+  "pods": [
+   "worker-5fc4d5999-2kljr",
+   "worker-5fc4d5999-554jd",
+   "worker-5fc4d5999-c57s9",
+   "worker-5fc4d5999-nhzsh"
+  ],
+  "counts": {
+   "queued": 0,
+   "running": 0,
+   "done": 300,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 300
+  },
+  "direct": null
+ }
+}

@@ -1,0 +1,90 @@
+{
+ "skip_locked": {
+  "n": 300,
+  "results_rows": 300,
+  "n_dup": 0,
+  "D": 0.0,
+  "n_dup_db": 0,
+  "D_db": 0.0,
+  "n_dup_log": 0,
+  "D_log": 0.0,
+  "dup_examples": [],
+  "only_db": 0,
+  "only_log": 0,
+  "duplicate_result_errors": 0,
+  "done_log_lines": 300,
+  "t_from": 1795113331.737273,
+  "t_to": 1795113337.297451,
+  "pods": [
+   "worker-65bd9685d-c58kj",
+   "worker-65bd9685d-g75d7",
+   "worker-65bd9685d-gq4pp",
+   "worker-65bd9685d-mhc6l"
+  ],
+  "counts": {
+   "queued": 0,
+   "running": 0,
+   "done": 300,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 300
+  },
+  "direct": {
+   "claims_empty": 5930.0,
+   "claims_task": 300.0,
+   "claim_count": 6230.0,
+   "claim_p99_s": 0.0024790090090090087
+  },
+  "lock_samples": 8,
+  "lock_wait_max": 0,
+  "locks_not_granted_max": 0,
+  "claim_p99_s": 0.002413617034267181,
+  "claims_empty": 24170.03395310234,
+  "claims_task": 373.47758838232585,
+  "claim_p99_log_ms": 33.489
+ },
+ "for_update": {
+  "n": 300,
+  "results_rows": 300,
+  "n_dup": 0,
+  "D": 0.0,
+  "n_dup_db": 0,
+  "D_db": 0.0,
+  "n_dup_log": 0,
+  "D_log": 0.0,
+  "dup_examples": [],
+  "only_db": 0,
+  "only_log": 0,
+  "duplicate_result_errors": 0,
+  "done_log_lines": 300,
+  "t_from": 1795113364.807285,
+  "t_to": 1795113370.378727,
+  "pods": [
+   "worker-5c7c5d49bc-4p5wl",
+   "worker-5c7c5d49bc-c5t2t",
+   "worker-5c7c5d49bc-jj52c",
+   "worker-5c7c5d49bc-wmk2d"
+  ],
+  "counts": {
+   "queued": 0,
+   "running": 0,
+   "done": 300,
+   "failed": 0,
+   "cancelled": 0,
+   "total": 300
+  },
+  "direct": {
+   "claims_empty": 6189.0,
+   "claims_task": 300.0,
+   "claim_count": 6489.0,
+   "claim_p99_s": 0.0024713331202046033
+  },
+  "lock_samples": 8,
+  "lock_wait_max": 0,
+  "locks_not_granted_max": 0,
+  "claim_p99_s": 0.002404137083560894,
+  "claims_empty": 24510.6,
+  "claims_task": 374.96813333333336,
+  "claim_p99_log_ms": 37.817
+ }
+}

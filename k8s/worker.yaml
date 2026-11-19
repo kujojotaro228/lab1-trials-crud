@@ -1,0 +1,62 @@
+# Lab 4: worker pool. No replicas field: the count is set by kubectl scale.
+# Modes (CLAIM_MODE, STORE_MODE, POLL_MS, LEASE_SECONDS, FAIL_RATE, PROCESS_PASSES)
+# are changed by the loadtest/lab4.py orchestrator via `kubectl set env deployment/worker`.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: trials
+  labels: {app: worker}
+spec:
+  selector:
+    matchLabels: {app: worker}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate: {maxSurge: 1, maxUnavailable: 0}
+  template:
+    metadata:
+      labels: {app: worker}
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: worker
+          image: trials-worker:lab4
+          imagePullPolicy: Never
+          ports:
+            - {name: metrics, containerPort: 9100}
+          envFrom:
+            - configMapRef: {name: web-config}       # DB_HOST, DB_PORT, DB_NAME, DB_USER
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef: {name: db-secret, key: POSTGRES_PASSWORD}
+            - name: WORKER_ID                         # pod name
+              valueFrom:
+                fieldRef: {fieldPath: metadata.name}
+            - {name: WEB_URL, value: "http://web:8000"}
+            - {name: CLAIM_MODE, value: skip_locked}   # naive | for_update | skip_locked
+            - {name: STORE_MODE, value: idempotent}    # plain | idempotent
+            - {name: POLL_MS, value: "10"}             # variant 25: T_poll = 10 ms
+            - {name: LEASE_SECONDS, value: "15"}       # variant 25: L = 15 s
+            - {name: FAIL_RATE, value: "0"}
+            - {name: PROCESS_PASSES, value: "1"}
+            - {name: Q_LO, value: "0.02"}              # variant 25
+            - {name: Q_HI, value: "0.98"}
+            - {name: SLICE_SIZE, value: "256"}
+            - {name: SHUTDOWN_DEADLINE, value: "25"}   # < terminationGracePeriodSeconds
+          resources:
+            requests: {cpu: 250m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 512Mi}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: worker
+  namespace: trials
+spec:
+  selector:
+    matchLabels: {app: worker}
+  podMetricsEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 5s

@@ -1,0 +1,50 @@
+{
+ "rows": [
+  [
+   "`POST /trial-participants/1/tasks`",
+   202,
+   202,
+   "✅",
+   "`{\"id\": 1, \"record_id\": 1, \"status\": \"queued\", \"seed\": 639106670, \"attempts\": 0, \"max_attempts\": 3, \"token\": 0, \"lease_until\": null, \"worker_id\": null, \"created_`"
+  ],
+  [
+   "`POST /trial-participants/999999/tasks`",
+   404,
+   404,
+   "✅",
+   "`{\"error\": \"not_found\", \"message\": \"Учасника з id=999999 не знайдено\", \"details\": []}`"
+  ],
+  [
+   "`GET /tasks/1`",
+   200,
+   200,
+   "✅",
+   "`{\"id\": 1, \"record_id\": 1, \"status\": \"queued\", \"seed\": 639106670, \"attempts\": 0, \"max_attempts\": 3, \"token\": 0, \"lease_until\": null, \"worker_id\": null, \"created_`"
+  ],
+  [
+   "`GET /tasks/999999`",
+   404,
+   404,
+   "✅",
+   "`{\"error\": \"not_found\", \"message\": \"Задачу з id=999999 не знайдено\", \"details\": []}`"
+  ],
+  [
+   "`GET /tasks?status=queued&limit=2&offset=1`",
+   200,
+   200,
+   "✅",
+   "`{\"items\": [{\"id\": 2, \"record_id\": 2, \"status\": \"queued\", \"seed\": 640923411, \"attempts\": 0, \"max_attempts\": 3, \"token\": 0, \"lease_until\": null, \"worker_id\": null`"
+  ],
+  [
+   "`GET /tasks?status=bad`",
+   400,
+   400,
+   "✅",
+   "`{\"error\": \"validation_error\", \"message\": \"Невалідні дані запиту\", \"details\": [{\"field\": \"status\", \"location\": \"query\", \"message\": \"фільтр має бути одним із знач`"
+  ]
+ ],
+ "queued_gauge": [
+  "5",
+  "5"
+ ]
+}

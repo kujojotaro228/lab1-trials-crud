@@ -1,0 +1,39 @@
+{
+ "t_from": 1795114046.536965,
+ "t_gen_end": 1795114168.205551,
+ "t_to": 1795114168.742321,
+ "counts_end": {
+  "queued": 0,
+  "running": 0,
+  "done": 6936,
+  "failed": 0,
+  "cancelled": 0,
+  "total": 6936
+ },
+ "counts_drained": {
+  "queued": 0,
+  "running": 0,
+  "done": 6936,
+  "failed": 0,
+  "cancelled": 0,
+  "total": 6936
+ },
+ "gen_codes": {
+  "202": 6936
+ },
+ "rate": 57.8,
+ "exits": [],
+ "returned": 0,
+ "total": 6936,
+ "statuses": {
+  "done": 6936
+ },
+ "failed": 0,
+ "multi_result": 0,
+ "attempts_gt1": 0,
+ "attempts_dist": {
+  "1": 6936
+ },
+ "t_restart": 1795114086.983649,
+ "t_restarted": 1795114093.639751
+}
