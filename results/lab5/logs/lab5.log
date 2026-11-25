@@ -1,0 +1,42 @@
+2026-11-25 16:27:12 ==== lab5 all: n=9, D=10.0 s, warm-up 1.0 s, 3 repeats
+2026-11-25 16:27:13 host: {"python": "3.12.3", "implementation": "CPython", "gil_enabled": true, "switch_interval_s": 0.005, "platform": "Windows-11-10.0.26200-SP0", "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel", "logical_cpus": 12, "numpy": "2.5.4"}
+2026-11-25 16:27:13 start selftest: selftest
+2026-11-25 16:27:14 done  selftest: selftest OK: {"global: 100000 snapshot() calls leave all fields unchanged": true, "rw: 100000 snapshot() calls leave all fields unchanged": true, "rw: two readers hold the lock at once": true, "rw: a writer waits while readers are inside": true, "rw phase: a new reader waits while a writer is waiting": true}
+2026-11-25 16:27:14 start tcs_1: tcs --D 10.0
+2026-11-25 16:27:36 done  tcs_1: t_cs,w = 0.199 us, t_cs,r = 0.151 us (global lock, 1 thread)
+2026-11-25 16:27:36 start tcs_2: tcs --D 10.0
+2026-11-25 16:27:59 done  tcs_2: t_cs,w = 0.199 us, t_cs,r = 0.180 us (global lock, 1 thread)
+2026-11-25 16:27:59 start tcs_3: tcs --D 10.0
+2026-11-25 16:28:21 done  tcs_3: t_cs,w = 0.244 us, t_cs,r = 0.154 us (global lock, 1 thread)
+2026-11-25 16:28:21 start x1_global_1: x1 --lock global --n 9 --D 10.0
+2026-11-25 16:28:32 done  x1_global_1: X_1 (global, WRWRWRWRW): 1816543 op/s (N_w=10091907, N_r=8073525)
+2026-11-25 16:28:32 start x1_global_2: x1 --lock global --n 9 --D 10.0
+2026-11-25 16:28:44 done  x1_global_2: X_1 (global, WRWRWRWRW): 1808494 op/s (N_w=10047191, N_r=8037753)
+2026-11-25 16:28:44 start x1_global_3: x1 --lock global --n 9 --D 10.0
+2026-11-25 16:28:55 done  x1_global_3: X_1 (global, WRWRWRWRW): 1772489 op/s (N_w=9847162, N_r=7877730)
+2026-11-25 16:28:55 start x1_rw_1: x1 --lock rw --n 9 --D 10.0
+2026-11-25 16:29:06 done  x1_rw_1: X_1 (rw, WRWRWRWRW): 1116906 op/s (N_w=6205035, N_r=4964028)
+2026-11-25 16:29:06 start x1_rw_2: x1 --lock rw --n 9 --D 10.0
+2026-11-25 16:29:17 done  x1_rw_2: X_1 (rw, WRWRWRWRW): 1062408 op/s (N_w=5902267, N_r=4721815)
+2026-11-25 16:29:17 start x1_rw_3: x1 --lock rw --n 9 --D 10.0
+2026-11-25 16:29:29 done  x1_rw_3: X_1 (rw, WRWRWRWRW): 1126389 op/s (N_w=6257714, N_r=5006172)
+2026-11-25 16:29:29 start run_global_1: run --lock global --n 9 --D 10.0
+2026-11-25 16:29:40 done  run_global_1: global n=9: X_w=108660 X_r=83761 X=192421 op/s | p50/p99 w=4.40/220.20 us r=39.80/228.30 us | max t_wait w=1.14 ms | w_w=0.933 w_r=0.934 | invariants OK | per thread 1w:217330 2r:208271 3w:218377 4r:211341 5w:216546 6r:208950 7w:217671 8r:209052 9w:216676
+2026-11-25 16:29:40 start run_rw_1: run --lock rw --n 9 --D 10.0
+2026-11-25 16:29:51 done  run_rw_1: rw/phase n=9: X_w=29706 X_r=118822 X=148528 op/s | p50/p99 w=94.60/1328.70 us r=1.30/362.40 us | max t_wait w=30.23 ms | w_w=0.972 w_r=0.932 | invariants OK | per thread 1w:57031 2r:303507 3w:60910 4r:307956 5w:59567 6r:268632 7w:60663 8r:308128 9w:58884
+2026-11-25 16:29:51 start run_global_2: run --lock global --n 9 --D 10.0
+2026-11-25 16:30:03 done  run_global_2: global n=9: X_w=108046 X_r=83109 X=191155 op/s | p50/p99 w=4.60/224.50 us r=39.60/234.40 us | max t_wait w=1.39 ms | w_w=0.933 w_r=0.934 | invariants OK | per thread 1w:216184 2r:206871 3w:216525 4r:209310 5w:216508 6r:206969 7w:215498 8r:207937 9w:215745
+2026-11-25 16:30:03 start run_rw_2: run --lock rw --n 9 --D 10.0
+2026-11-25 16:30:14 done  run_rw_2: rw/phase n=9: X_w=29618 X_r=118473 X=148092 op/s | p50/p99 w=99.00/1132.30 us r=1.30/366.50 us | max t_wait w=28.15 ms | w_w=0.972 w_r=0.931 | invariants OK | per thread 1w:58940 2r:296596 3w:61986 4r:305856 5w:58360 6r:284200 7w:59523 8r:298081 9w:57374
+2026-11-25 16:30:14 start run_global_3: run --lock global --n 9 --D 10.0
+2026-11-25 16:30:25 done  run_global_3: global n=9: X_w=108870 X_r=83286 X=192156 op/s | p50/p99 w=3.30/216.90 us r=40.00/224.30 us | max t_wait w=1.22 ms | w_w=0.933 w_r=0.935 | invariants OK | per thread 1w:217227 2r:207221 3w:218072 4r:207037 5w:217930 6r:210842 7w:218485 8r:207761 9w:216986
+2026-11-25 16:30:25 start run_rw_3: run --lock rw --n 9 --D 10.0
+2026-11-25 16:30:36 done  run_rw_3: rw/phase n=9: X_w=30857 X_r=123427 X=154284 op/s | p50/p99 w=96.90/1115.30 us r=1.20/360.70 us | max t_wait w=30.89 ms | w_w=0.972 w_r=0.931 | invariants OK | per thread 1w:62537 2r:306028 3w:60209 4r:296976 5w:62011 6r:316924 7w:61724 8r:314344 9w:62087
+2026-11-25 16:30:36 supplementary: RWLock with reader preference (policy=reader)
+2026-11-25 16:30:36 start run_rwreader_1: run --lock rw --policy reader --n 9 --D 10.0
+2026-11-25 16:30:48 done  run_rwreader_1: rw/reader n=9: X_w=160868 X_r=651549 X=812416 op/s | p50/p99 w=0.90/1.60 us r=0.70/1.10 us | max t_wait w=1142.20 ms | w_w=0.836 w_r=0.466 | invariants OK | per thread 1w:346007 2r:1539318 3w:254456 4r:1637168 5w:443816 6r:1569610 7w:247261 8r:1769390 9w:317136
+2026-11-25 16:30:48 start run_rwreader_2: run --lock rw --policy reader --n 9 --D 10.0
+2026-11-25 16:30:59 done  run_rwreader_2: rw/reader n=9: X_w=170997 X_r=632587 X=803584 op/s | p50/p99 w=0.90/1.60 us r=0.70/1.10 us | max t_wait w=1745.23 ms | w_w=0.861 w_r=0.483 | invariants OK | per thread 1w:457526 2r:1379289 3w:269330 4r:1504268 5w:308047 6r:1669639 7w:384610 8r:1772675 9w:290456
+2026-11-25 16:30:59 start run_rwreader_3: run --lock rw --policy reader --n 9 --D 10.0
+2026-11-25 16:31:10 done  run_rwreader_3: rw/reader n=9: X_w=172915 X_r=633019 X=805934 op/s | p50/p99 w=0.90/1.50 us r=0.70/1.10 us | max t_wait w=1187.39 ms | w_w=0.898 w_r=0.517 | invariants OK | per thread 1w:357326 2r:1532544 3w:293730 4r:1506212 5w:397608 6r:1664661 7w:403071 8r:1626769 9w:277418
+2026-11-25 16:31:10 ==== all done; next: py lab5/analyze.py

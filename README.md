@@ -71,6 +71,19 @@ py loadtest/lab4_analyze.py        # results/lab4/summary.md, fig/*.png
 
 ---
 
+## ЛР 5: потокобезпечна структура даних
+
+Звіт — [REPORT5.md](REPORT5.md). Варіант 25: агрегатор статистики на 25 кошиків (С5), 9 потоків;
+структура і RWLock — [lab5/aggregator.py](lab5/aggregator.py), стенд — [lab5/stand.py](lab5/stand.py).
+Docker не потрібен.
+
+```powershell
+py lab5/stand.py all               # усі прогони (~4 хв), results/lab5/raw/*.json
+py lab5/analyze.py                 # таблиці 1–6: results/lab5/tables.md, fig/*.png
+```
+
+---
+
 ## Етап 1. Проєктування
 
 ### Таблиця `trial_participants`

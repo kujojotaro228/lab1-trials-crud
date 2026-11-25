@@ -1,0 +1,19 @@
+{
+ "mode": "tcs",
+ "lock": "global",
+ "D": 10.0,
+ "t_cs_w_us": 0.19875388388447007,
+ "t_cs_r_us": 0.15130879778738401,
+ "N_w": 14634511,
+ "N_r": 22790037,
+ "env": {
+  "python": "3.12.3",
+  "implementation": "CPython",
+  "gil_enabled": true,
+  "switch_interval_s": 0.005,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "logical_cpus": 12,
+  "numpy": "2.5.4"
+ }
+}

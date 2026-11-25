@@ -1,0 +1,27 @@
+{
+ "mode": "x1",
+ "lock": "global",
+ "policy": null,
+ "n": 9,
+ "pattern": "WRWRWRWRW",
+ "D": 10.0,
+ "N_w": 10047191,
+ "N_r": 8037753,
+ "X1": 1808494.4,
+ "X1_w": 1004719.1,
+ "X1_r": 803775.3,
+ "invariants": {
+  "count_eq_add_calls": true,
+  "sum_bins_eq_count": true
+ },
+ "env": {
+  "python": "3.12.3",
+  "implementation": "CPython",
+  "gil_enabled": true,
+  "switch_interval_s": 0.005,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+  "logical_cpus": 12,
+  "numpy": "2.5.4"
+ }
+}

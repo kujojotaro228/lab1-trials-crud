@@ -1,0 +1,11 @@
+{
+ "mode": "selftest",
+ "checks": {
+  "global: 100000 snapshot() calls leave all fields unchanged": true,
+  "rw: 100000 snapshot() calls leave all fields unchanged": true,
+  "rw: two readers hold the lock at once": true,
+  "rw: a writer waits while readers are inside": true,
+  "rw phase: a new reader waits while a writer is waiting": true
+ },
+ "ok": true
+}
