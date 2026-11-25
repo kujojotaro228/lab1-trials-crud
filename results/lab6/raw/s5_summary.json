@@ -1,0 +1,15 @@
+{
+ "K_c": 20,
+ "s_f": 50,
+ "fail_step": 50,
+ "t_f": 1795622627.0023682,
+ "last_ckpt_step": 40,
+ "t_c": 1795622626.5951304,
+ "restored_step": 40,
+ "steps_redone": 9,
+ "t_first_step_after_restore": 1795622630.6897857,
+ "restart_start_t": 1795622629.035293,
+ "t_f_minus_t_c": 0.4072377681732178,
+ "t_r": 3.687417507171631,
+ "t_lost": 4.094655275344849
+}

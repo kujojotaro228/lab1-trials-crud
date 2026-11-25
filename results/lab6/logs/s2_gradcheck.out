@@ -1,0 +1,17 @@
+[torchrun_win] patched: torch.distributed.elastic.rendezvous.static_tcp_rendezvous, torch.distributed.elastic.rendezvous.c10d_rendezvous_backend, SubprocessHandler.close -> kill on Windows, api._get_default_signal -> SIGTERM, api._get_kill_signal -> SIGTERM
+[W1125 17:01:52.000000000 socket.cpp:764] [c10d] The client socket has failed to connect to [kubernetes.docker.internal]:29650 (system error: 10049 - “ребуемый адрес дл€ своего контекста неверен.).
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] Failed to register signal handler for SIGHUP
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] Traceback (most recent call last):
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]   File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\api.py", line 545, in start
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]     sig = getattr(signal, sig_name.strip())
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+W1125 17:01:52.134000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] AttributeError: module 'signal' has no attribute 'SIGHUP'
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] Failed to register signal handler for SIGQUIT
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] Traceback (most recent call last):
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]   File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\api.py", line 545, in start
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]     sig = getattr(signal, sig_name.strip())
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549]           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+W1125 17:01:53.450000 18932 site-packages\torch\distributed\elastic\multiprocessing\api.py:549] AttributeError: module 'signal' has no attribute 'SIGQUIT'
+[W1125 17:01:55.000000000 socket.cpp:764] [c10d] The client socket has failed to connect to [kubernetes.docker.internal]:29650 (system error: 10049 - “ребуемый адрес дл€ своего контекста неверен.).
+[W1125 17:01:55.000000000 socket.cpp:764] [c10d] The client socket has failed to connect to [kubernetes.docker.internal]:29650 (system error: 10049 - “ребуемый адрес дл€ своего контекста неверен.).
+{"mode": "gradcheck", "sync": "manual", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "max_ratio": 7.640855619458381e-06, "b_per_process": 96, "t_sync_ms": 43.626599999697646}

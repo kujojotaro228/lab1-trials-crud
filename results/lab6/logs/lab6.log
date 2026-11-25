@@ -1,0 +1,269 @@
+2026-11-25 16:48:59 ==== prepare
+2026-11-25 16:49:13 downloading https://zenodo.org/records/10519652/files/dermamnist.npz?download=1
+2026-11-25 16:49:31 data dermamnist.npz: {'train_images': [7007, 28, 28, 3], 'val_images': [1003, 28, 28, 3], 'test_images': [2005, 28, 28, 3], 'train_labels': [7007, 1], 'val_labels': [1003, 1], 'test_labels': [2005, 1]}
+2026-11-25 16:49:33 host and model: {"cpu": "12th Gen Intel(R) Core(TM) i5-12450H", "C_phys": 8, "logical": 12, "memory_gb": 16.866684928, "python": "3.12.3", "torch": "2.15.0+cpu", "os": "Windows-11-10.0.26200-SP0", "gloo": true, "n_th": 4, "dataset": "Д1 dermamnist", "K": 7, "C": 3, "c1": 32, "c2": 64, "h": 256, "n_params": 824263, "n_params_counted": 824263, "n_tensors": 8, "M_bytes": 3297052, "M_MiB": 3.1443138122558594, "N": 7000, "B": 192, "P_max": 2, "K_c": 20, "s_f": 50, "data_shapes": {"train_images": [7007, 28, 28, 3], "val_images": [1003, 28, 28, 3], "test_images": [2005, 28, 28, 3], "train_labels": [7007, 1], "val_labels": [1003, 1], "test_labels": [2005, 1]}, "n_test": 2005}
+2026-11-25 16:49:33 ==== finished
+2026-11-25 16:49:45 ==== check
+2026-11-25 16:49:45 start check_smoke: -m torch.distributed.run --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29881 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode smoke --sync ddp --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\check_smoke.json
+2026-11-25 16:49:47 FAILED check_smoke (exit code 1, 2.1 s). Last output:
+rozen runpy>", line 88, in _run_code
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1142, in <module>
+    main()
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\errors\__init__.py", line 384, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1138, in main
+    run(args)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1129, in run
+    elastic_launch(
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 197, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 377, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 744, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 915, in _invoke_run
+    self._initialize_workers(self._worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 712, in _initialize_workers
+    self._rendezvous(worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 527, in _rendezvous
+    rdzv_info = spec.rdzv_handler.next_rendezvous()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\rendezvous\static_tcp_rendezvous.py", line 67, in next_rendezvous
+    self._store = TCPStore(  # type: ignore[call-arg]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.distributed.DistStoreError: use_libuv was requested but PyTorch was built without libuv support, run with USE_LIBUV=0 to disable it.
+
+2026-11-25 16:50:03 ==== step1
+2026-11-25 16:50:03 start s1_single_train: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_train.json
+2026-11-25 16:50:14 done  s1_single_train (11.0 s): {"mode": "train", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 5.361062526702881, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271492712314791, "n_test": 2005, "max_loss_last_epoch": 1.0927832126617432}
+2026-11-25 16:50:14 start s1_single_speed: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_speed.json
+2026-11-25 16:50:21 done  s1_single_speed (6.3 s): {"mode": "speed", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.3291568999957235, "t_step_ms": 44.69355000037467, "t_step_mean_ms": 46.58313799991447, "X": 4121.66307903844, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": null}
+2026-11-25 16:50:21 ==== step2
+2026-11-25 16:50:21 start s2_gradcheck: -m torch.distributed.run --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29552 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode gradcheck --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_gradcheck.json
+2026-11-25 16:50:23 FAILED s2_gradcheck (exit code 1, 2.0 s). Last output:
+rozen runpy>", line 88, in _run_code
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1142, in <module>
+    main()
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\errors\__init__.py", line 384, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1138, in main
+    run(args)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1129, in run
+    elastic_launch(
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 197, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 377, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 744, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 915, in _invoke_run
+    self._initialize_workers(self._worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 712, in _initialize_workers
+    self._rendezvous(worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 527, in _rendezvous
+    rdzv_info = spec.rdzv_handler.next_rendezvous()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\rendezvous\static_tcp_rendezvous.py", line 67, in next_rendezvous
+    self._store = TCPStore(  # type: ignore[call-arg]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.distributed.DistStoreError: use_libuv was requested but PyTorch was built without libuv support, run with USE_LIBUV=0 to disable it.
+
+2026-11-25 16:51:57 ==== step1
+2026-11-25 16:51:57 start s1_single_train: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_train.json
+2026-11-25 16:52:07 done  s1_single_train (9.8 s): {"mode": "train", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.864513158798218, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271492712314791, "n_test": 2005, "max_loss_last_epoch": 1.0927832126617432}
+2026-11-25 16:52:07 start s1_single_speed: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_speed.json
+2026-11-25 16:52:13 done  s1_single_speed (6.4 s): {"mode": "speed", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.3627730999869527, "t_step_ms": 45.46420000042417, "t_step_mean_ms": 47.255461999739055, "X": 4063.022386725586, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": null}
+2026-11-25 16:52:13 ==== step2
+2026-11-25 16:52:13 start s2_gradcheck: -m torch.distributed.run --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29859 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode gradcheck --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_gradcheck.json
+2026-11-25 16:52:15 FAILED s2_gradcheck (exit code 1, 2.1 s). Last output:
+rozen runpy>", line 88, in _run_code
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1142, in <module>
+    main()
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\errors\__init__.py", line 384, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1138, in main
+    run(args)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1129, in run
+    elastic_launch(
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 197, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 377, in launch_agent
+    result = agent.run()
+             ^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 744, in run
+    result = self._invoke_run(role)
+             ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 915, in _invoke_run
+    self._initialize_workers(self._worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 712, in _initialize_workers
+    self._rendezvous(worker_group)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\metrics\api.py", line 134, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\agent\server\api.py", line 527, in _rendezvous
+    rdzv_info = spec.rdzv_handler.next_rendezvous()
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\rendezvous\static_tcp_rendezvous.py", line 67, in next_rendezvous
+    self._store = TCPStore(  # type: ignore[call-arg]
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.distributed.DistStoreError: use_libuv was requested but PyTorch was built without libuv support, run with USE_LIBUV=0 to disable it.
+
+2026-11-25 16:53:59 ==== check
+2026-11-25 16:53:59 start check_smoke: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29762 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode smoke --sync ddp --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\check_smoke.json
+2026-11-25 16:54:05 FAILED check_smoke (exit code 1, 6.2 s). Last output:
+reate_c10d_store
+    return TCPStore(
+           ^^^^^^^^^
+torch.distributed.DistStoreError: use_libuv was requested but PyTorch was built without libuv support, run with USE_LIBUV=0 to disable it.
+    store, rank, world_size = next(rendezvous_iterator)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\rendezvous.py", line 296, in _env_rendezvous_handler
+    store = _create_c10d_store(
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\rendezvous.py", line 206, in _create_c10d_store
+    return TCPStore(
+           ^^^^^^^^^
+torch.distributed.DistStoreError: use_libuv was requested but PyTorch was built without libuv support, run with USE_LIBUV=0 to disable it.
+E1125 16:54:05.384000 20172 site-packages\torch\distributed\elastic\multiprocessing\api.py:1002] failed (exitcode: 1) local_rank: 0 (pid: 19540) of binary: C:\Users\Illia\AppData\Local\Programs\Python\Python312\python.exe
+Traceback (most recent call last):
+  File "C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py", line 52, in <module>
+    main()
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\elastic\multiprocessing\errors\__init__.py", line 384, in wrapper
+    result = f(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1138, in main
+    run(args)
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\run.py", line 1129, in run
+    elastic_launch(
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 197, in __call__
+    return launch_agent(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Illia\AppData\Local\Programs\Python\Python312\Lib\site-packages\torch\distributed\launcher\api.py", line 386, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+============================================================
+C:\Users\Illia\Desktop\trials-crud\lab6\train.py FAILED
+------------------------------------------------------------
+Failures:
+[1]:
+  time      : 2026-11-25_16:54:05
+  host      : DESKTOP-82E2TOM.Realtek
+  rank      : 1 (local_rank: 1)
+  exitcode  : 1 (pid: 11276) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+------------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2026-11-25_16:54:05
+  host      : DESKTOP-82E2TOM.Realtek
+  rank      : 0 (local_rank: 0)
+  exitcode  : 1 (pid: 19540) 
+  error_file: <N/A>
+  traceback : To enable traceback see: https://pytorch.org/docs/stable/elastic/errors.html
+============================================================
+
+2026-11-25 16:55:18 ==== check
+2026-11-25 16:55:18 start check_smoke: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29769 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode smoke --sync ddp --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\check_smoke.json
+2026-11-25 16:55:26 done  check_smoke (7.6 s): {"mode": "smoke", "P": 2, "all_reduce": 3.0, "all_gather": [0.0, 1.0], "weight_sums": [11.449148548850463, 11.449148548850463], "n_th": 4, "torch": "2.15.0+cpu", "gloo": true}
+2026-11-25 16:55:26 smoke test OK: all_reduce = 3.0 (expected 3), weight sums after 2 DDP steps [11.449148548850463, 11.449148548850463]
+2026-11-25 16:55:26 ==== finished
+2026-11-25 16:55:40 ==== step1
+2026-11-25 16:55:40 start s1_single_train: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_train.json
+2026-11-25 16:55:50 done  s1_single_train (9.7 s): {"mode": "train", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.78288459777832, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271492712314791, "n_test": 2005, "max_loss_last_epoch": 1.0927832126617432}
+2026-11-25 16:55:50 start s1_single_speed: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_speed.json
+2026-11-25 16:55:56 done  s1_single_speed (6.2 s): {"mode": "speed", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.217236899996351, "t_step_ms": 42.320000000472646, "t_step_mean_ms": 44.34473799992702, "X": 4329.713257079476, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": null}
+2026-11-25 16:55:56 ==== step2
+2026-11-25 16:55:56 start s2_gradcheck: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29600 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode gradcheck --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_gradcheck.json
+2026-11-25 16:56:02 done  s2_gradcheck (5.9 s): {"mode": "gradcheck", "sync": "manual", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "max_ratio": 7.640855619458381e-06, "b_per_process": 96, "t_sync_ms": 8.2408000016585}
+2026-11-25 16:56:02 start s2_manual_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29601 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_manual_speed.json
+2026-11-25 16:56:14 done  s2_manual_speed (11.3 s): {"mode": "speed", "sync": "manual", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 3.263390199987043, "t_step_ms": 64.59514999914973, "t_step_mean_ms": 65.26780399974086, "X": 2941.7260614553893, "t_sync_ms": 24.108249999699183, "t_sync_mean_ms": 25.086667999785277, "weight_sum_spread": 0.0}
+2026-11-25 16:56:14 start s2_ddp_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29602 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_speed.json
+2026-11-25 16:56:24 done  s2_ddp_speed (10.0 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.285050799993769, "t_step_ms": 42.71664999760105, "t_step_mean_ms": 45.70101599987538, "X": 4201.219509004429, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 16:56:24 start s2_ddp_nosync_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29603 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --nosync --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_nosync_speed.json
+2026-11-25 16:56:34 done  s2_ddp_nosync_speed (10.2 s): {"mode": "speed", "sync": "ddp", "nosync": true, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.2622400000145717, "t_step_ms": 43.3309999989433, "t_step_mean_ms": 45.244800000291434, "X": 4243.581582828597, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 16:56:34 start s2_ddp_train: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29604 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_train.json
+2026-11-25 16:56:48 done  s2_ddp_train (13.8 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 5.040404558181763, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271187099121919, "n_test": 2005, "max_loss_last_epoch": 1.0928107500076294}
+2026-11-25 16:56:48 ==== step3
+2026-11-25 16:56:48 start s3_ddp_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29605 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s3_ddp_speed_p1.json
+2026-11-25 16:56:58 done  s3_ddp_speed_p1 (9.9 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.3309190000109083, "t_step_ms": 44.144499999674736, "t_step_mean_ms": 46.61838000021817, "X": 4118.547233925792, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 16:56:58 start s3_ddp_nosync_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29606 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --nosync --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s3_ddp_nosync_speed_p1.json
+2026-11-25 16:57:08 done  s3_ddp_nosync_speed_p1 (9.9 s): {"mode": "speed", "sync": "ddp", "nosync": true, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.2841648000066925, "t_step_ms": 43.422149999969406, "t_step_mean_ms": 45.68329600013385, "X": 4202.849111400313, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 16:57:08 ==== step4
+2026-11-25 16:57:08 start s4_ddp_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29607 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 96 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_ddp_speed_p1.json
+2026-11-25 16:57:16 done  s4_ddp_speed_p1 (8.5 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 1, "B": 96, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 1.0741287999953784, "t_step_ms": 20.179600001938525, "t_step_mean_ms": 21.482575999907567, "X": 4468.737827363583, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 16:57:16 start s4_train_p1_b: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29608 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 96 --lr 0.02 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_train_p1_b.json
+2026-11-25 16:57:29 done  s4_train_p1_b (13.2 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 1, "B": 96, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 72, "steps_total": 216, "train_time_s": 4.629790544509888, "resumed_from_step": null, "acc": 0.6987531172069825, "auc": 0.8537253669977335, "n_test": 2005, "max_loss_last_epoch": 1.113000750541687}
+2026-11-25 16:57:29 start s4_train_pmax_lrP: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29609 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --lr 0.04 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_train_pmax_lrP.json
+2026-11-25 16:57:44 done  s4_train_pmax_lrP (14.2 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.04, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 5.068406820297241, "resumed_from_step": null, "acc": 0.6827930174563591, "auc": 0.8279731524696906, "n_test": 2005, "max_loss_last_epoch": 1.030198574066162}
+2026-11-25 16:57:44 ==== step5
+2026-11-25 16:57:44 step 5: K_c = 20, s_f = 50, rank 1 calls os._exit(1) at the start of step s_f; torchrun --max-restarts=1
+2026-11-25 16:57:44 start s5_fail_train: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=1 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29610 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --ckpt-every 20 --ckpt-dir C:\Users\Illia\Desktop\trials-crud\results\lab6\ckpt --fail-step 50 --fail-marker C:\Users\Illia\Desktop\trials-crud\results\lab6\ckpt\failed.marker --events C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s5_events --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s5_fail_train.json
+2026-11-25 17:01:34 ==== step1
+2026-11-25 17:01:34 start s1_single_train: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_train.json
+2026-11-25 17:01:44 done  s1_single_train (9.8 s): {"mode": "train", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.917532444000244, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271492712314791, "n_test": 2005, "max_loss_last_epoch": 1.0927832126617432}
+2026-11-25 17:01:44 start s1_single_speed: C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync none --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s1_single_speed.json
+2026-11-25 17:01:50 done  s1_single_speed (6.2 s): {"mode": "speed", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.2197608000024047, "t_step_ms": 42.91459999876679, "t_step_mean_ms": 44.395216000048094, "X": 4324.790310735103, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": null}
+2026-11-25 17:01:50 ==== step2
+2026-11-25 17:01:50 start s2_gradcheck: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29650 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode gradcheck --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_gradcheck.json
+2026-11-25 17:01:56 done  s2_gradcheck (6.0 s): {"mode": "gradcheck", "sync": "manual", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "max_ratio": 7.640855619458381e-06, "b_per_process": 96, "t_sync_ms": 43.626599999697646}
+2026-11-25 17:01:56 start s2_manual_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29651 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync manual --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_manual_speed.json
+2026-11-25 17:02:07 done  s2_manual_speed (11.4 s): {"mode": "speed", "sync": "manual", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 3.417654599990783, "t_step_ms": 65.48705000022892, "t_step_mean_ms": 68.35309199981566, "X": 2808.9438880177913, "t_sync_ms": 27.44524999980058, "t_sync_mean_ms": 28.256626000002143, "weight_sum_spread": 0.0}
+2026-11-25 17:02:07 start s2_ddp_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29652 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_speed.json
+2026-11-25 17:02:17 done  s2_ddp_speed (10.1 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.161018499999045, "t_step_ms": 40.969250001580804, "t_step_mean_ms": 43.2203699999809, "X": 4442.349753139199, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 17:02:17 start s2_ddp_nosync_speed: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29653 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --nosync --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_nosync_speed.json
+2026-11-25 17:02:27 done  s2_ddp_nosync_speed (9.6 s): {"mode": "speed", "sync": "ddp", "nosync": true, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 1.7683649999999034, "t_step_ms": 36.37850000086473, "t_step_mean_ms": 35.36729999999807, "X": 5428.743500352317, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 17.61027912501047}
+2026-11-25 17:02:27 start s2_ddp_train: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29654 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s2_ddp_train.json
+2026-11-25 17:02:41 done  s2_ddp_train (13.7 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.848439455032349, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271187099121919, "n_test": 2005, "max_loss_last_epoch": 1.0928107500076294}
+2026-11-25 17:02:41 ==== step3
+2026-11-25 17:02:41 start s3_ddp_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29655 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s3_ddp_speed_p1.json
+2026-11-25 17:02:51 done  s3_ddp_speed_p1 (10.0 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.277737699991121, "t_step_ms": 42.76775000107591, "t_step_mean_ms": 45.554753999822424, "X": 4214.708304664502, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 17:02:51 start s3_ddp_nosync_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29656 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --nosync --B 192 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s3_ddp_nosync_speed_p1.json
+2026-11-25 17:03:01 done  s3_ddp_nosync_speed_p1 (10.5 s): {"mode": "speed", "sync": "ddp", "nosync": true, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 2.482129400010308, "t_step_ms": 45.409500002278946, "t_step_mean_ms": 49.64258800020616, "X": 3867.646868031994, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 17:03:01 ==== step4
+2026-11-25 17:03:01 start s4_ddp_speed_p1: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29657 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode speed --sync ddp --B 96 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_ddp_speed_p1.json
+2026-11-25 17:03:10 done  s4_ddp_speed_p1 (8.9 s): {"mode": "speed", "sync": "ddp", "nosync": false, "P": 1, "B": 96, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "steps_measured": 50, "t_measure_s": 1.1110900000057882, "t_step_ms": 20.811650001633097, "t_step_mean_ms": 22.221800000115763, "X": 4320.082081537044, "t_sync_ms": null, "t_sync_mean_ms": null, "weight_sum_spread": 0.0}
+2026-11-25 17:03:10 start s4_train_p1_b: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=1 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29658 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 96 --lr 0.02 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_train_p1_b.json
+2026-11-25 17:03:24 done  s4_train_p1_b (13.5 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 1, "B": 96, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 72, "steps_total": 216, "train_time_s": 4.724836826324463, "resumed_from_step": null, "acc": 0.6987531172069825, "auc": 0.8537253669977335, "n_test": 2005, "max_loss_last_epoch": 1.113000750541687}
+2026-11-25 17:03:24 start s4_train_pmax_lrP: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=0 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29659 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --lr 0.04 --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s4_train_pmax_lrP.json
+2026-11-25 17:03:38 done  s4_train_pmax_lrP (14.0 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.04, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.989840030670166, "resumed_from_step": null, "acc": 0.6827930174563591, "auc": 0.8279731524696906, "n_test": 2005, "max_loss_last_epoch": 1.030198574066162}
+2026-11-25 17:03:38 ==== step5
+2026-11-25 17:03:38 step 5: K_c = 20, s_f = 50, rank 1 calls os._exit(1) at the start of step s_f; torchrun --max-restarts=1
+2026-11-25 17:03:38 start s5_fail_train: C:\Users\Illia\Desktop\trials-crud\lab6\torchrun_win.py --nnodes=1 --nproc_per_node=2 --max-restarts=1 --rdzv-backend=static --master-addr=127.0.0.1 --master-port=29660 --node-rank=0 C:\Users\Illia\Desktop\trials-crud\lab6\train.py --mode train --sync ddp --B 192 --ckpt-every 20 --ckpt-dir C:\Users\Illia\Desktop\trials-crud\results\lab6\ckpt --fail-step 50 --fail-marker C:\Users\Illia\Desktop\trials-crud\results\lab6\ckpt\failed.marker --events C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s5_events --out C:\Users\Illia\Desktop\trials-crud\results\lab6\raw\s5_fail_train.json
+2026-11-25 17:03:56 done  s5_fail_train (18.0 s): {"mode": "train", "sync": "ddp", "nosync": false, "P": 2, "B": 192, "b": 96, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 1, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 3.2296934127807617, "resumed_from_step": 40, "acc": 0.6793017456359102, "auc": 0.8271187099121919, "n_test": 2005, "max_loss_last_epoch": 1.0928107500076294}
+2026-11-25 17:03:56 step 5 summary: {"K_c": 20, "s_f": 50, "fail_step": 50, "t_f": 1795622627.0023682, "last_ckpt_step": 40, "t_c": 1795622626.5951304, "restored_step": 40, "steps_redone": 9, "t_first_step_after_restore": 1795622630.6897857, "restart_start_t": 1795622629.035293, "t_f_minus_t_c": 0.4072377681732178, "t_r": 3.687417507171631, "t_lost": 4.094655275344849}
+2026-11-25 17:03:56 ==== finished

@@ -1,0 +1,1 @@
+{"mode": "train", "sync": "none", "nosync": false, "P": 1, "B": 192, "b": 192, "lr": 0.02, "n_th": 4, "torch_threads": 4, "restart_count": 0, "tag": "", "n_e": 36, "steps_total": 108, "train_time_s": 4.917532444000244, "resumed_from_step": null, "acc": 0.6793017456359102, "auc": 0.8271492712314791, "n_test": 2005, "max_loss_last_epoch": 1.0927832126617432}

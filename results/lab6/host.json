@@ -1,0 +1,60 @@
+{
+ "cpu": "12th Gen Intel(R) Core(TM) i5-12450H",
+ "C_phys": 8,
+ "logical": 12,
+ "memory_gb": 16.866684928,
+ "python": "3.12.3",
+ "torch": "2.15.0+cpu",
+ "os": "Windows-11-10.0.26200-SP0",
+ "gloo": true,
+ "n_th": 4,
+ "dataset": "Д1 dermamnist",
+ "K": 7,
+ "C": 3,
+ "c1": 32,
+ "c2": 64,
+ "h": 256,
+ "n_params": 824263,
+ "n_params_counted": 824263,
+ "n_tensors": 8,
+ "M_bytes": 3297052,
+ "M_MiB": 3.1443138122558594,
+ "N": 7000,
+ "B": 192,
+ "P_max": 2,
+ "K_c": 20,
+ "s_f": 50,
+ "data_shapes": {
+  "train_images": [
+   7007,
+   28,
+   28,
+   3
+  ],
+  "val_images": [
+   1003,
+   28,
+   28,
+   3
+  ],
+  "test_images": [
+   2005,
+   28,
+   28,
+   3
+  ],
+  "train_labels": [
+   7007,
+   1
+  ],
+  "val_labels": [
+   1003,
+   1
+  ],
+  "test_labels": [
+   2005,
+   1
+  ]
+ },
+ "n_test": 2005
+}

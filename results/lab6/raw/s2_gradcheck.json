@@ -1,0 +1,98 @@
+{
+ "mode": "gradcheck",
+ "sync": "manual",
+ "nosync": false,
+ "P": 2,
+ "B": 192,
+ "b": 96,
+ "lr": 0.02,
+ "n_th": 4,
+ "torch_threads": 4,
+ "restart_count": 0,
+ "tag": "",
+ "per_tensor": [
+  {
+   "tensor": "features.0.weight",
+   "shape": [
+    32,
+    3,
+    3,
+    3
+   ],
+   "max_abs_diff": 8.009374141693115e-08,
+   "max_abs_g": 0.010482300072908401,
+   "ratio": 7.640855619458381e-06
+  },
+  {
+   "tensor": "features.0.bias",
+   "shape": [
+    32
+   ],
+   "max_abs_diff": 9.12696123123169e-08,
+   "max_abs_g": 0.017551511526107788,
+   "ratio": 5.200099841916965e-06
+  },
+  {
+   "tensor": "features.3.weight",
+   "shape": [
+    64,
+    32,
+    3,
+    3
+   ],
+   "max_abs_diff": 6.332993507385254e-08,
+   "max_abs_g": 0.020288756117224693,
+   "ratio": 3.1214301511607636e-06
+  },
+  {
+   "tensor": "features.3.bias",
+   "shape": [
+    64
+   ],
+   "max_abs_diff": 7.264316082000732e-08,
+   "max_abs_g": 0.029025038704276085,
+   "ratio": 2.502775674483605e-06
+  },
+  {
+   "tensor": "head.1.weight",
+   "shape": [
+    256,
+    3136
+   ],
+   "max_abs_diff": 7.450580596923828e-09,
+   "max_abs_g": 0.01413979846984148,
+   "ratio": 5.269226865442981e-07
+  },
+  {
+   "tensor": "head.1.bias",
+   "shape": [
+    256
+   ],
+   "max_abs_diff": 3.725290298461914e-09,
+   "max_abs_g": 0.03987870737910271,
+   "ratio": 9.34155228013746e-08
+  },
+  {
+   "tensor": "head.3.weight",
+   "shape": [
+    7,
+    256
+   ],
+   "max_abs_diff": 2.9802322387695312e-08,
+   "max_abs_g": 0.07487740367650986,
+   "ratio": 3.9801490068284433e-07
+  },
+  {
+   "tensor": "head.3.bias",
+   "shape": [
+    7
+   ],
+   "max_abs_diff": 2.9802322387695312e-08,
+   "max_abs_g": 0.4687308371067047,
+   "ratio": 6.358088700042351e-08
+  }
+ ],
+ "max_ratio": 7.640855619458381e-06,
+ "b_per_process": 96,
+ "t_sync_ms": 43.626599999697646
+}

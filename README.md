@@ -84,6 +84,21 @@ py lab5/analyze.py                 # таблиці 1–6: results/lab5/tables.m
 
 ---
 
+## ЛР 6: розподілене навчання за даними на CPU
+
+Звіт — [REPORT6.md](REPORT6.md). Варіант 25: DermaMNIST, ширина Ш2, P_max = 2, B = 192;
+цикл навчання — [lab6/train.py](lab6/train.py), запуск усіх прогонів — [lab6/lab6.py](lab6/lab6.py).
+
+```powershell
+py -m pip install torch numpy scikit-learn psutil matplotlib
+py lab6/lab6.py prepare            # дані з Zenodo у data/, host.json
+py lab6/lab6.py check              # gloo + DDP на 2 процесах
+py lab6/lab6.py all                # кроки 1–5
+py lab6/analyze.py                 # results/lab6/tables.md, fig/*.png
+```
+
+---
+
 ## Етап 1. Проєктування
 
 ### Таблиця `trial_participants`
